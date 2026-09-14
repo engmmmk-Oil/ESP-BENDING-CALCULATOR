@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APC ESP Bending Calculator | Alkhorayef Petroleum GOS</title>
+<meta name="description" content="ESP Bending Calculator — 4-method max allowable length, stress analysis, DLS calculator. Per TB-GOS-ESP-DEV-001 Rev 0.">
+<meta name="author" content="Alkhorayef Petroleum — Global Operations Support">
+<style>
+
+/* APC Brand Style v3 — Locked palette */
+:root {
+    --cool-gray: #474454;
+    --gold: #CFBF9A;
+    --gold-light: #EBE4D2;
+    --soft-white: #F4F2F1;
+    --warm-gray-2: #CCC3BB;
+    --warm-gray-7: #948984;
+    --red: #D36962;
+    --red-light: #F5D0CD;
+    --blue: #799CCF;
+    --blue-light: #D8E4F1;
+    --sage: #A3BC93;
+    --sage-light: #D8E4CE;
+    --orange: #E2A268;
+    --orange-light: #F5DDBE;
+    --white: #FFFFFF;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    color: var(--cool-gray);
+    background: var(--soft-white);
+    line-height: 1.45;
+    padding: 0;
+    margin: 0;
+}
+
+/* ============ HEADER ============ */
+header.apc-header {
+    background: var(--white);
+    border-bottom: 3px solid var(--gold);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header.apc-header .logo {
+    height: 50px;
+}
+
+header.apc-header .title-block {
+    text-align: center;
+    flex-grow: 1;
+}
+
+header.apc-header .title-block .company {
+    font-size: 13pt;
+    font-weight: bold;
+    color: var(--cool-gray);
+    letter-spacing: 0.5px;
+}
+
+header.apc-header .title-block .sub {
+    font-size: 9pt;
+    font-style: italic;
+    color: var(--warm-gray-7);
+    margin-top: 2px;
+}
+
+header.apc-header .doc-info {
+    text-align: right;
+    font-size: 9pt;
+    color: var(--cool-gray);
+}
+
+header.apc-header .doc-info .doc-no {
+    font-weight: bold;
+}
+
+header.apc-header .doc-info .rev {
+    color: var(--warm-gray-7);
+}
+
+/* ============ TITLE BAR ============ */
+.title-bar {
+    background: linear-gradient(180deg, var(--cool-gray) 0%, #3a3743 100%);
+    color: var(--white);
+    padding: 22px 30px;
+    text-align: center;
+}
+
+.title-bar h1 {
+    font-size: 22pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.title-bar h2 {
+    font-size: 13pt;
+    font-weight: normal;
+    font-style: italic;
+    color: var(--gold);
+}
+
+.title-bar .subtitle {
+    font-size: 10pt;
+    color: var(--warm-gray-2);
+    margin-top: 6px;
+}
+
+/* ============ CONTAINER ============ */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ============ SECTIONS ============ */
+.section {
+    background: var(--white);
+    border: 1px solid var(--warm-gray-2);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.section-header {
+    background: var(--cool-gray);
+    color: var(--white);
+    padding: 12px 20px;
+    font-size: 13pt;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-header .badge {
+    background: var(--gold);
+    color: var(--cool-gray);
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-body {
+    padding: 20px;
+}
+
+.section h3 {
+    color: var(--cool-gray);
+    font-size: 11pt;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 14px;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 4px;
+}
+
+.section h3:first-child { margin-top: 0; }
+
+.section p {
+    color: var(--cool-gray);
+    margin-bottom: 10px;
+    font-size: 10pt;
+}
+
+.reference {
+    font-size: 9pt;
+    font-style: italic;
+    color: var(--warm-gray-7);
+    margin-bottom: 8px;
+}
+
+/* ============ INPUT GRID ============ */
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.input-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+.input-grid.four-col { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 9pt;
+    font-weight: bold;
+    color: var(--cool-gray);
+    margin-bottom: 3px;
+}
+
+.input-group .unit {
+    color: var(--warm-gray-7);
+    font-weight: normal;
+    font-style: italic;
+}
+
+.input-group select,
+.input-group input[type="number"],
+.input-group input[type="text"] {
+    padding: 6px 8px;
+    font-family: Arial;
+    font-size: 10pt;
+    color: var(--cool-gray);
+    background: var(--white);
+    border: 1px solid var(--warm-gray-2);
+    border-radius: 2px;
+    outline: none;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(207,191,154,0.3);
+}
+
+.input-group .readonly {
+    background: var(--soft-white);
+    color: var(--warm-gray-7);
+}
+
+/* ============ BUTTONS ============ */
+button.apc-btn {
+    background: var(--cool-gray);
+    color: var(--white);
+    border: none;
+    padding: 8px 20px;
+    font-family: Arial;
+    font-size: 10pt;
+    font-weight: bold;
+    border-radius: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+    margin-right: 6px;
+    margin-top: 6px;
+}
+
+button.apc-btn:hover { background: #3a3743; }
+
+button.apc-btn.gold {
+    background: var(--gold);
+    color: var(--cool-gray);
+}
+
+button.apc-btn.gold:hover { background: #b9a988; }
+
+button.apc-btn.red { background: var(--red); color: var(--white); }
+button.apc-btn.sage { background: var(--sage); color: var(--cool-gray); }
+
+/* ============ TABLES ============ */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10pt;
+    margin-top: 10px;
+}
+
+.data-table th {
+    background: var(--cool-gray);
+    color: var(--white);
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: bold;
+    border: 1px solid var(--warm-gray-2);
+}
+
+.data-table td {
+    padding: 6px 10px;
+    border: 1px solid var(--warm-gray-2);
+    color: var(--cool-gray);
+    background: var(--white);
+}
+
+.data-table tr:nth-child(even) td {
+    background: var(--soft-white);
+}
+
+.data-table td.label-cell {
+    background: var(--gold);
+    color: var(--cool-gray);
+    font-weight: bold;
+    width: 40%;
+}
+
+.data-table td.numeric { text-align: right; font-family: 'Courier New', monospace; }
+.data-table td.center { text-align: center; }
+
+.data-table input {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid var(--warm-gray-2);
+    font-family: Arial;
+    font-size: 9pt;
+    color: var(--cool-gray);
+    text-align: center;
+}
+
+/* ============ RESULT CARDS ============ */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.result-card {
+    background: var(--white);
+    border: 1px solid var(--warm-gray-2);
+    border-left: 4px solid var(--gold);
+    padding: 12px;
+    border-radius: 2px;
+}
+
+.result-card .label {
+    font-size: 9pt;
+    color: var(--warm-gray-7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.result-card .value {
+    font-size: 20pt;
+    font-weight: bold;
+    color: var(--cool-gray);
+    line-height: 1.2;
+}
+
+.result-card .unit {
+    font-size: 10pt;
+    font-weight: normal;
+    color: var(--warm-gray-7);
+    margin-left: 4px;
+}
+
+.result-card .method {
+    font-size: 9pt;
+    color: var(--warm-gray-7);
+    font-style: italic;
+    margin-top: 4px;
+}
+
+/* Result card variants for stress banding */
+.result-card.sage { border-left-color: var(--sage); background: var(--sage-light); }
+.result-card.orange { border-left-color: var(--orange); background: var(--orange-light); }
+.result-card.red { border-left-color: var(--red); background: var(--red-light); }
+.result-card.gold-fill { background: var(--gold-light); }
+
+/* ============ CALLOUTS ============ */
+.callout {
+    padding: 12px 16px;
+    border-left: 4px solid var(--blue);
+    background: var(--blue-light);
+    margin: 12px 0;
+    border-radius: 2px;
+    font-size: 10pt;
+}
+
+.callout.sage { border-left-color: var(--sage); background: var(--sage-light); }
+.callout.orange { border-left-color: var(--orange); background: var(--orange-light); }
+.callout.red { border-left-color: var(--red); background: var(--red-light); }
+.callout.gold { border-left-color: var(--gold); background: var(--gold-light); }
+
+.callout .callout-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: var(--cool-gray);
+    font-size: 10pt;
+}
+
+.callout .callout-body {
+    color: var(--cool-gray);
+    font-size: 10pt;
+}
+
+/* ============ TABS ============ */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: 0;
+    background: var(--soft-white);
+}
+
+.tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 10pt;
+    font-weight: bold;
+    color: var(--warm-gray-7);
+    background: transparent;
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+}
+
+.tab:hover { color: var(--cool-gray); background: var(--gold-light); }
+
+.tab.active {
+    color: var(--cool-gray);
+    background: var(--white);
+    border-bottom-color: var(--gold);
+}
+
+.tab-content { display: none; padding: 20px; background: var(--white); }
+.tab-content.active { display: block; }
+
+/* ============ CHART ============ */
+.chart-container {
+    background: var(--white);
+    padding: 15px;
+    border: 1px solid var(--warm-gray-2);
+    border-radius: 2px;
+    margin-top: 12px;
+}
+
+.chart-svg {
+    width: 100%;
+    height: 500px;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+    justify-content: center;
+    font-size: 10pt;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-swatch {
+    width: 20px;
+    height: 3px;
+}
+
+/* ============ CONFIG BAR ============ */
+.config-bar {
+    background: var(--gold);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--warm-gray-2);
+    font-size: 10pt;
+    color: var(--cool-gray);
+}
+
+.config-bar .config-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-bar .config-item .label {
+    font-weight: bold;
+}
+
+/* ============ FOOTER ============ */
+footer.apc-footer {
+    background: var(--cool-gray);
+    color: var(--white);
+    padding: 20px;
+    margin-top: 30px;
+    font-size: 9pt;
+    text-align: center;
+}
+
+footer.apc-footer .references {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    text-align: left;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--warm-gray-7);
+}
+
+footer.apc-footer .references h4 {
+    color: var(--gold);
+    font-size: 10pt;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+footer.apc-footer .references ul {
+    list-style: none;
+    padding: 0;
+}
+
+footer.apc-footer .references li {
+    padding: 2px 0;
+    color: var(--warm-gray-2);
+}
+
+footer.apc-footer .copyright {
+    color: var(--warm-gray-2);
+    font-style: italic;
+}
+
+/* ============ EQUATION DISPLAY ============ */
+.equation {
+    background: var(--soft-white);
+    border-left: 3px solid var(--gold);
+    padding: 10px 15px;
+    margin: 10px 0;
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-size: 12pt;
+    color: var(--cool-gray);
+}
+
+.equation .eq-label {
+    font-family: Arial;
+    font-size: 9pt;
+    font-weight: bold;
+    color: var(--warm-gray-7);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* ============ PRINT STYLES ============ */
+@media print {
+    .no-print { display: none !important; }
+    body { background: white; }
+    .section { break-inside: avoid; }
+    header.apc-header { position: static; }
+}
+
+/* Utility */
+.hidden { display: none; }
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.bold { font-weight: bold; }
+
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="apc-header no-print">
+    <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAd0AAACcCAYAAAA6TnETAABaw0lEQVR4nO2deZxlVXXvf2vvfc6tqUegGRUhIlptBNP6JIjearomBVToPtUNaNRoIIJxyMvwoi+5dTO8vCTPWUEwxuAAUodWQdAeqbqAhESJQ+wWxIAz0gw91HjPHtb745xTdWvqrqru6q7u3t/Pp6St4Zy9zzn3rL3WXuu3CMc+FEWR2LVrF61YsYLjOLYTf6FYfGtdk9KnaWnOhMMLiPlMEM5g4BQwn0DAEhA1glEHQQEzjwiF8zZtip8GQAD48E/L4/F4PEcbdKQHME9QFEUCACYa2WIxaqqroxexxXkCOB/gZgbOBnAyETUKIUGU2lFmZP9lgAEGg4jgnBt0ZM7euvWru+CNrsfj8XhmiDrSAziEjDO0ubEtFt9aV1c39HJiUWTnXkuE84jpNBmkU2dmOOfA7MDMMEY7gGqMKBOlVhhIjSsx4A7rzDwej8dzTHDUG91SqST6+vpEpVIxuaG9tHjliSbkFrC7BBguEouzpFRgwXDOwjkH5xIDAMwgIiaACAARkRh/hknBgGM1OuDxeDyeeeZoNboURZFobm7mcrnsALhiMWqqD2UbM3dp2DVKqpMIEtYZOOfYucSmBhYEQCCbe+rDejvq8Xg8nvnnaDO6FEWRqA0fv74tOt9BvJnB66QUZwKAtQZaa0sEBlgAJAAo8rbV4/F4PEeQo8XojjO2URTJgb10GTNd68DtSimRGtrEAcREEESQ2Z8e2ZF7PB6Px5Ox4I1uFEUyN7bF4lvr6sORq/v34t1SyPMBwBgNrRMDsJi8H+vxeDwez8JhwRqpUqkkAFDm2Yad7euvqQ+Hv6uk+mdBdL7WidNaW6QZxSoLIXs8Ho/Hs2BZiJ4uRVEkyuWyBYDOtq4N/XvpA0qo37bOItGJzcp4vJH1eDwez1HFgjJcURRJABzHsW1vX39hZ9v6e6VUtwnQbyc6sdYaRwTpDe7MYO6R3NMjj/Q4PB6Px5OyUIwX5Xu3nRdFJ72uresGCTwghVittbbGG9tZUSqVBDMTUZelri7L2f8/0uPyeDye450jbsRqvduO1uhKqpcPSxW8yzkHbYz1xnZ29PaWVLlcdkTEP37g03/4yH03vIWy/++9Xo/H4zmyHMk9XSoWizKOY1MsRqc0FMRHhJAbnLPQumoAUmNlP54DwQwCegRRl/lu70desKSu8eP1dYXLrGM8/m+f6di3T/8xdXTt6u0tqdWry+ZIj9fj8XiOR46QB1kSAFCpVExnW9dlDaH4tpRqg9baWmsZoIWY4LVgYS4JIjBRl330vhuvXFLX9O1CIbxsT/+g6R8YsvV14dVLlgTffrTyqUtWry4bZiZOs8M9Ho/Hcxg57C/eNJxcdogi0dna9Y9CyLtAOEPrqslCyX7vcRb09pYUUdn1fq5U99/fuunGpsb6Wx3ziXv7By2BFBHJPfsGDTOeX1dfd/d/P3jz33d3E1G57Hy42ePxeA4vh9XAFYtFValUTPtr3vg8UVf4vFJhS5KMOAA4SvZtmYjIMfczmRce6dZ+3FtStLpsvr/9I+cuamj6QkND3St37+23zBBiwuKFGQ4ELF/SJAYGR+7dN2R+7+Wt7/qVDzd7PB7P4eOwGbrc4La2REVRX/dvUqoWrUcMEXklqdlDvZnB3dn7iUsXNS56MAjUK3fv6TcEkhMNLgAQQRAgntvTb+rqgouXNKqHdvR9/DWrV5cN95Z8ON/j8XgOA4fD2FEURbJSqZj21nVvD0KxlUCnp2pSfu92tjAz9fREYvXqsnmk8un3NTQ0fN05t3xgcNgSHfh6EpHaNzBkiOiMhrqGbTsrN7yVVpcNc49Mk7E8Ho/HM1/Mt9GlUqlEcRzb9tborwIV/otzrHKRi3k+9zFHJo2Jrq7YPvatT394yZKGj1Sr2mltHRHN+HoSSA1XE5doEyxuavjXR+6/4S+JuixQIl/P6/F4PPPHfHqaBIDK5bLraI0+FQThdUmSWCLfmGAucKkkKO0drB771k23LG5quGr33gHDzHNKPhNEwjnHA4PDdumSRX/96H03nkz0rneXShCcNh4+IvvUHo/HcywzX15NflzqaI0+H4aFq5OkarAwtZ5nwxFJpEpLgsqut7dUd0Zw2h2LFzVcsntPvwZRcPDHBkAwy5c0qX0DQ1984auv/b30m/CG1+PxeA4x82EEBQBEUUT9u3F7EBTWJsmIBg7eQByPcCk1uJs3/1PjGcHiOxc11a95bk+/pkNgcAEg85HV7j39etnSRW/+yQM31X037tqwY0cze4/X4/F4Di2HOsxLpVIJALBvN24PwsLaRHuDO1dKpZJAd5kf7PlQ/VmNi+9a1FS/ZvfegUNmcMdBFOze068XL2pYd96pa27v7u5moNvv8Xo8Hs8h5FC+UCmKIpFpKH8pCApX6WPP4B628HJq7Lqprw/i9OCUry9uauycN4M7/rx6+dJFwZ59g1869zV/+GbmHgl0OaIjU4vs8Xg8xxKHzNPNdJRtR2t0Qxgekwb3sMEMQhwLorI7LTj1S0sWNR0WgwsAlHm8S5c0Xv2jyo03EHVZ9JV8prnH4/EcAg6J0R1VmmpdVwqCwruSpOoN7sHQV5LU1WV/1PepTy5d3Ni1+xDu4c4IomD3ngG9fGnTu3b23VAiL6Dh8Xg8h4SDNrq5wW27OHpboMLutEMQvMGdI7m0447eG/502bJF1+/ZM3BIspRnPQ4g2LNv0Cxd3ND9w95PvJ1Wl02vN7wej8dzUByU0c2VpjouXvsapeRnjDEW8KIXc4W5R6YG91NvWryo7h/39Q8Zx0emzIoAOOfk4HDVNjbU37yj74ZUMtI3SfB4PJ45M2ejWyqVRBzH9pKLo9NJqh6AFbMjHOYmCscKaS1ul/3hto8119eFX6gmxhnjJNGRu55ERMZYYseqEMr4+70fO4O6uqxvC+jxeDxzY64vT9q5cydFUSQN4XYp5SnWOuuVpuZGXpbz5Pc+31ioq4ullE1aGxbiyLc5JCIxkiS2rlA4uU4VvszcI7FypS8l8ng8njkwJyOZZyrvfdb9YxgWXm1MYryW8tzp6+uWRGW3e8/ATYua6puHhkfMbLSU5xtBQu4bGDJLFze+emfl6X+iri7b19e9YMbn8Xg8RwuzNrqjHYPWrL00CMM/TnTV+G5Bc4e5R65eXTb/de+n3rFsadPVe/YNmpl0CzrcCCK1Z9+AWdLU8P4f9X3qMr+/6/F4PLNnliHCdC+vre0HJ0oEPyCiFdZaPo7CyodUHCPXVN7Rd+M5daH8LgN1WhsxlwYGhwNmuEKoYK17Znhk+GUb79/9NACU00YMHo/H4zkAszKWUbSTgLITLG9QKjjZWueOI4N7qCHE6d6oIP6XQiFo1NpgoRpcACCCGEkSbmqsWxEEwY3lctm1tByWnswej8dzTDDjF2YURTKOY9t28boNgQrXau33cQ8G5h5BXV12R9+n3rdsadNF/QPDC2ofdzoECbm3f8gsWdx0+Q/7brhq9eqySaUiPR6Px3MgZmp0RXNzM69Z85YThBQftdY6gL2HM0eYSwKI3E8fuvms+kL4NwODw0dbfbMYHklcQYmPPvKdm05E9w4u+TIij8fjOSAzelFGUUTlctkpDP99oIKTHTsH+LDyXInjlUREPDhiPlFXFzZqbRd0WHkKRJJo19TUcJId0P9I5bLr7l55NI3f4/F4jggHNJyjYeW2ta8SUr1Ta21x9DejP2JwT4/s6uqyP+q74Q1LFjVcsq9/yB4NYeWJEJHa1z9oG+rr3v7YA5/+XaIu2+OzmT0ej2e/zNRbJbLiI4KImH2Ht7nCDEK0g5/o/VwdCfw/YwyPtpE/CnHMkELAWPeRVCwjPtJD8ng8ngXNfo1u7uW2r4m6gjD8XW2M9clTc6evrySJyq4qR961dHHTOcPVxBIdvdm/BJKDQyN2yeLGVz1SufHKrq7Y+qYIHo/HMz37e0FSHDdzZ2dngTX+xjnLAJOXVp4bmWyi/eGDZywnaz4wOFx1dEzsixNVq5pB9DdP9H7uK//a99OEGeSb3ns8Hs9kpn3pF4tFCZQdJ01vC8LwHGutr8k9CFKpR2KZmPctWdx4YqKNwyHqZ3wkIYIYriZu2ZLGs6ty5PfL5bLr803vPR6PZ0qmc1sJAC64IKpb3Mg7pVRnOmfYZyzPTZGqVCqJ7u5u/u79Hz+xkQqPCkFLjTnqMpanhQFXCBQlWv9iUYN8yWmrrhkGCN7b9Xg8nvFMaURTLxe8pImvDsPCC9K63OPe4M6ZlhYIIuJ6VtcvWdSwzKQdmY4JgwsABIiRRLuli5uev2+Qf4+I2Hu7Ho/HM5lpPd1Vq65RJy597gdSqXONMceTvvL+mLWnm+7lEh7fdtNiHbofq0CeZIxlHAOh5VoYcHWFgEZGkp/Yp0586coo0tm6wnu7Ho/HkzHpxV8sFhUAPmHJnktUEL7YGL+XezCke7lgXWffvGRJ4wptrMUxZnCBzNsdSdziRQ3nyFOefQMRcW+v93Y9Ho+nlkkv/5aWlrRjjHDvBXxR7sHS0tJte3tLyjlcX61qBh97BncUApxjBrv3AEBLC3z3IY/H46lhnAGIokiWy2XXvvry8wSJ1xpj4Oty5w5zjyQiPj047eJFDXUvGR5J+Giuyz0QBJIDg8MIw+Cixyo3/Q5R2fX0RP758Xg8noxxBmDXrl3pHq+Uv69UIADYIzGoY4U4E2iy1l4rpGSi48DzI7IN9XVk4N4JACed1HzMJIx5PB7PwUIT/s3FYtRUUHhMSnGKc47h1TBqmXEiValUEuVy2T267cbTUcCPiajBWmaiY/t6MjMHgSKtzdOyoF/4ogveu4+ZiYj8VoXH4znuGfV0szIhFBR1BEFwirXOwhvcOTPa3D3ktUsWNTZYx+ZYN7gAQESktbGLFzWcZJLg9UCaTHakx+XxeDwLgVGju2LFCgYAInclAPbCBgdHX18aSnaMDYk2IPAxb3BzMq+WBehKAHj66Z3+WfJ4PB6MebJZaPnSE+uC+p8Q0RJO2wkdN4ZihswovMxcEkRl96PtN5yr6uQPrXUSx9G1ZGZWUpJ1biBJqi98Wev7nvIhZo/H48k83bHQcv0apYIlzrEPLR8MfVkEQeLSRY31CsdZQhoRkbHWLm5qaArDujbAh5g9Ho8HyIzuWGgZbyAiH1o+WLLQMhEu1caCj6PQck7q1TKD+Q0A0PL0Sv9MeTye4x4BgOI4tpdeemkDM7dYawjwtblzpVQqCSqX3c7KTaeC8D+GR6oAH3+KXswsh0cSYvBrf9j7ySbq6rJZe0OPx+M5bhFRFAkAsNWGl0upTkubG/jQ8lzJs5aFsBctamposNbZ4yFreSJERIm2rqG+cLJU8hUAEMfxcbf48Hg8nlpELojhHFZLKUFEx76Aw+GAsUaQwHGdPERwhTCAAK0GgOikHcfd4sPj8XhqEaNay8SvZWYwH39e2aGkpaWchVHpwkRr8LGstXxAmLSxYOdeC2B0r9vj8XiOV1S5XHYXXviGRcz8cmctjmVt4PmmVEpLhXZ861NnSshzq1UNHIeh5VEYoppoAHjZE70fWUqr37/Hlw55PJ6jBCqVSrRz587Rd3hzczOXy2XGQbQsVQCwuL7uxSTpRC/7eHB0d6+kchmQRp7f1FQX9g8OWwIdt0lpRETGWFcohMurCa0E8K1sX/e4KqHKydpmTkml0uKA8oEiAZSX9019jIrF/PYvPtLn93jmmZIoFvtE/ixnBnZKoiiScRzP+l2mAMARnx/KAM4lNv+eZw70pXuWgvAKJSUA79EBcHV1oRhJqr8D4FsnLcx9XSqVSvsdV7kMzMAo7pdKpWL289OZHIL3f4x550if3+OZN1IjWraVSroN1tkZnQTIU2HsYnaOpAwSQ7S3waqnv7b9C8/OxeACmYEl4OWHcvDHK3FWi+qAlxvrAGYCLUQbc5hhBpFYyM/Yfle0B3loAohbW6MlktENQlh7ImI4GQbSVE285d6e3rxRxrgjZCH5trbLVwin3jP5DOwCqcSIGfn89u1f+/FUxzgY8uO1F694cVAXvllb42iKMjjN8hP33vtlrz7mOdogAIjj2La2Rs9XQrwFzJew4ZcQuaUkJEhIMBjkLA/D7O5sX/8rdq5v87b4vTXHmdEzr7Jfbc6TqLyNmDPU1dVle3tLCsC5Whv4qwmMJlMxrwSAlpZuC5SP9KByCAC3tm44TcDeAkARwFy7xcKwQRgonehbt2yPb559SKmbALDW4aKgYN+nlEKqsJodnhlhUIDR+ucAevv6+gQwPuGsuzs9hrTiFFUIPzjxDMyMQIWoJvY/APy4dg/qUDB6PFIrg7Dug9DJFI82gW0SA3gqH++hHIPHM0/kDzJ3tq7/XyTw51Kqpc45OGeR2kWTfR6JkGbpLFdSLddcPQHAe5E+6zP+zKlLL720QY/gLOcsiJj8lu7cKJVKVC6X+bTCKSezwenaGICP6zQqAAAzhNYGYHrBU72fbCKigYXiCRWLRVmpVIyAvaK+rqFV6+okY8IMSJLQlJwaRdFn4ziekwcZBNZZa/cxu4YJuuaGiBSRGzrwUYTROpkU3mWGBbMUAslcxjZjJFW1rhqtjSWaKKBDICl86NlzNEG5TsXe5+jWIAy6tE6gddUwQxBlRhbjojrMDGeMIWbaM5eTCjvceAYzn5y9B45zEzF3Vq5cmdY7a3FmIQzqrXXHfO/cmUBEpK0FEZ24G8EZ6Xe7F8R1aWmp5AZ0vdaJNcYmWhtb+2WMsdVkxEghz9n7LFYB4CiK5pocp6b74hmoljE72v8x3Lxe10xRbNrzOze/5/d4DiVRFIk4ju2e3fhEXaHQVa1Wk3RBTIqIBGq8YIAdg126DAeyn8/pPSAsuzOlkAXfVejgGEsQcmcVQgUiOi4zdKeCHbuG+lA4gecDAOKVR/w5S/cp4V63Zv2LBNEF1hpBhJAIcuIXAEipCALrASAXlPF4PEcn+TZR2+ro4lCpd1WTEU2EEBNsIDMsABJCCimUEEKK0SgP85yiXgqEs0gIsHFucsjIM1NaRv/FZwkhZhfkP8YhIhcoKSRVzwSAvgWQwZzvnTrYtYEqqCxsO2XmPoOFtRbEuLyzs/MDmzZtqmKKlo4ej+fooLm5mQFASPwvgDgNJ0/6NQ6CQBqTaOfck2BYBgKAGwEsA9EijH8PjCupa2lpcTt37qSsttflP1cAn+nzfQ6evrF/Po/hZb1qSTcuCA54HlC7QDlyZHV4xKAu5xyYWUz3OSCQsNY4pYKznGm8CMD2PDR1WAft8XgOAVk2fvv657F1rzVG0xSiUE4IKawxH7Zwnx4YkL/UepkJgt3qxELQyMKeYh2dVCqVUE7rCRkYXxZYqUwqA+RKpWIUEZ8B9gv2gyVvXUfAqc5xXuZxpIe1ICDkOyF8GjBugXJEyENLnWvWvhxCnGet4WyPZlqIyAkhyBixAcB2H2L2eI5OomgnxTFAzr1cBaowMTGQGTYIAqm1/tiW7fH/nPDnGsAwgGcAYMu9QF4WePHFG04OhH0fmPepoNCQ2OH/gJPLIegnW7f2PNjevv4MSXSlYBanpCbXt107KKIo07DGidY6n5JWAzOTYwdirACOfG/d3GAyiS6lFGFmClnSWkMgvqxYjJqyFa2/yx7PUcbo55/5TCKBCf3jmQjCWqNZ4GNRFMlMSY5qv0qlkhhLqExfAw0NZAH8BkTXM7uTmeU+IvxfYv4EAIZ1766va/gHRcAJ3tM9eIgojSrfT0tTT9c7ujlEgHMORFgGAN07dhzRB65SqdhVq64JmJ9ba63db2i5BrLW2SAIT4YzrQDuzEuODsOQj2bmRb92tucEgDhu5oNVFTuYMdX8e7bznnI+wOic5vNaHknm9z4SNU71bSEEWev2DA5Xn9m69S6LKfI3JojpMADcffdtzwD4WEfrulaTjHxqW+9Xv9/euu6HxPSCiy+OmkFYOTTU/2sFYDGD4U3E3MlERfjHj30stEBTZmA8GcxEzjEc02IAOJRqSbMlDy2fuOTZC4QMzrHWuImhZWbYbPU7LrGKCEwAk+ANAL62YsWKo/ZFVyqVRJZMtl/muqjIj1+pVMx0al+5p3CI9sapWCzKlpYWVy6X3f4UxorFosp/by7nmOoHU+hOUxRFYteuXTQ3TepUA3gm8wHGXUu3/3Olx53upytWrOCDuR9RFMnptl5mduyZax/P5j5OGJcqFosgomklj4nYBQHJYrGoBgYGqKmpadI4Jt7XmnOEUqkTSqWSeOhbO/YCvDEU4kvMbrMDNSqAG72je7CkucryZ3V1LnR1qYqJd3VHISDtpYGGnp5IdnXFllMH+LA/eaOhJSE2SCnhnHVAmkQxtpeTbGOmXWEYvjlJktqsfmmsIQCda9a86YQ4jp/FUZnFPCoTOR+LH3ryySflzTffrAG4VauuCU49of+3LMzznBUNQiAhyCedpMfj+Ev7gFGZybl6a5QntVUqFVOpVNDZefViwL4Alk9hh3oGrCB+JoT4+V3bvvzr/PdKpZJAGSjP3GuakfZ0vrCrNTBRFIW7diGsr+/XWfb7AeaTagBXKhW0tkZLpJRnMLsV5HgRWBARawDPCaueHHS/+lUcx6bmXPtRTSu7XFt4f2PAHO/FQRjscfMGUu1j6fB8x2KFcwhBzhDoWen4F/fcG/+q9j4eSBt9wrgMALS3dg1MOxjAVSp37pnNBJqbmzmOY9veGi1yzopyuew61kRnAPgQCO8h0PvAfIkCUd1R985YoOwtjIQNCELnVzHjSD/BDALC889/uwJie4RqqqhSqZgoiur3Poc3WmsAjGUtEoGFEACoh9g9BuAtE//eObZhEC6BwesBfPFoCzHnou4dq9eulGH4dms0TxbFYRZCwTmHEVP9u+bm5n0zObaUQgDgm2++Wb+uNfptFvQO8J7XaccvlFIJFaQim9ZZsOHfdLZtqLBz/1wul7elRyiJ2YQNc03oOI5te3u0nBxdQYQ3sdWrCDhFCAmS6dPnnEOV3UBnW9cjgNgCi9vL5fIPxq7J/oxFrp+94TRF9o8nVmeSEIBUH9206Uu/LBaLKo5jUywWVX148usAej3Dnd+/G6fUKYTES01b67pvb912x7r9zaetLTpLkljLzJ0AvxTWnqykBKnscWWGYwcLPVKnVvy8s73rQQJt/OaW278Rx7GdOKf82B1rulqVkq/X1hiq6fXNBBeoQGqdfH/L9js+j/RzMZtFGQHgjovXXSuVepG2xonR54pZqoC0Mb/auj3+CCYY9dp5t7ZGzw9JrHfgy9jwSx2JZUIICEkAi2zOPNjZtv5RAm215G4rl8vfn+4+juqGt657u1LhS43RFmBFTI7Br7LWAhiXuUzMDMdY0tYafVwwkjySOfYrzCSF4Cp9YnPl9p/m58i9cgH8hRX8IwBwAh8oFIa/rwcLr1x8onhs327xJ4pTvdn8onkOgjquUwyr/BpmMqn0CgeN+36ReY2H3+pmHpHr302rlZKnG6Mnhpal1okmJe4l6n9Sa/GsEOIE5vEtLxnMzHwlgC+0tLS4KUoDFiT5S2n16jf9FgVqs1LqdEFiytugpMLwyND7WlrO37dz504F7F9ikojAVVuNokgO7BX/BODdSqog3TO3MEa7vOtWKjoiTpFSrGdB6zvbum7XLrl++/byszNt1hBFkSyXy7azs7MAt+T9BPyRDNRpzIz0nG7iOQURNQkhXiGEfIUl82edbRs2Jtb+dRzHO/dneEulbiqXwULYUwNV+J8TtbODIMTgyOC3gNKvK5WyaV+z9lIp1N8JKV9GREhL0hzgGFIIWEOTPN3R+VwUnYQGUQLjrUqqJmYHax0YDsaY0fnkcwKoTpB4kRTyRQx+W2f7+u9YNh+M43hL7ZzyfVF2dkjIwvtDMSHCzICQElon/W+48A1fvevBu/oxc4+XAPCll155oh4xn1QqUEKOReGZGWFYgLH9nwLG5Fdr510sRk0NIf1vJvpDIdUSZNrHjh1b40afh+w+NgpBvyOE/B02/CedbV23W/D/juP4iWKxqGoXwfm8ienNYRBeTBiTxHfOYgqjC04btDSEQfBHU0+XIYTCsB64E8BPa/acGQA2bYtHXwhbt8b3Zv/ckf13syBmL4hxkGQC75BBQQAk2EtjjIOZKbO6Yne/PuA+4nwPxzFvECSYiEY/zMywSipyzP++efPtP920aVOVmb+plGLUZDdnmY1EJFqKxcvPSA1E6UjP6YDkL+CO11x+akGFmwSJ00dGRhJtEqN1/lXVWicjzjkMDQ5dt3lb/LHszw8YMmR22kq5aN9uujtQ4fudc0rrxDhnHAAmIlGr8MXsWGttjTE2UOH6QBb6OjouPzUzuPu9nvlc2ldffh65Jf+mpPp7ZpyWJInVWttskYQJ5yRmZmOMS8fllJJyfUGJ/+hoi67PvcP9z5JqrlX6ZYweMUYbYj4bKLv2i6/4YBAUvk6CXqa1tunvGOucdY7ZOmcdg8fpbI/emzXR76JBfFtJdT0zN6XnMPl8xl3DfE4As3XGpfdRW0HiFYEIN7e3rv3z2jmlxrcktvRufDCpDveyczpJkuroXExiRkaGq4EKFo3U17XjAL2Ta8l+j5Jh/XqlAjlSHa7WXCNtjNbDw4MjEPRRIBWNqJ13WzE6vyEUD0kV/jmYl+TXLFdJnDjn2vvI7KRSwVUK4jsdrWuvqFQqZqq+1QzsScejq2P3zuxncceYeK/HvnSidWKEkHqqv8yuOdX+u1RK3xFRFMkF/7LweA4RFMexLRbfuJQIr8/2ZkdfKkRgEgIE3JF/TwjRw+yIx2udEDObIAjq66R4IwDsLzFlIVAqlUQcx/aiiy5ZRoXwm1KqFxqT2Ez2rkY/mSgICnXWmL/a0hvfWCwW1Uy8ziz2ZgTsF5VSndVkOPc0VCYWP9UKdPRlWk1GtJLqpTDqK1EUhVEU0TR/M/qibm1Zu0YF4X1E4uWpQL3j8cZouqGSyOYLbRLDjhtDVfhkR+u6D6fPx+QXds502tNEpIhpWUdrV0ehrvFvjTHWGJvXfqr0vySyMLWoja6M1Yx3vVJIuUUQnZnoqs5iQ2rM0MAh3Ys0mTShyb5A6TVWRJDGGGuttYWg/v+2rVl3Xa3hzZ9TB7qFhAgmzwMSRMxwbwbAM00UzIwoA6lMKhFJjOqBQyilAuf437dsiX+SRzLGFk5rL1QF2UdCrEySEZ0ZWlWzqHD5fJlhOZVeHH8fddUwsFzKcGPr6nVvz7aQxi8Ysnsx4b4d6HM7jc44p3ObRms8iy5w7b/zz1Ecx1aw1wg+aLq7uxkArK46gB0djbk18wgRcbq9w27ZouCIZC7nq/GCCjuUCk5wzuWlAEB6s6TWuuoId+V/Ew6O9Gmjn5JCSNTcUGYQOwcWYj0AVCotRywb+8CkSUqXrrq0obGu4etSyfOMSQyRmOjF6DAoqESPfGTz9vhvJobp9genq5J6KcS5WicOIIV0cTJqKDBmLCZBREGSVHVYKFywdzf+ODN+k7ysfPHQ2hr9dhCqOxlYbIyx+flqh1RzPgbScUxxfsVgTnRVh2Hd+9tb15WmfGHvf+7CWgsQVjPcp4zRjtnRFJK6XBsazqcex83c2Xn1YhD3EFGTTYvBA4x7NpmVUjIIQhWoQAVBkP47CBWRyK9zdi0hGY4SnVgpxEc7VkfnxnHsSqVSnhEMJnwtSZKnxYTnGlktugC1vf710SmZwThAyC41oq2tG04johY7YTGbjkkAwOeBVH41v4+dq9f/llTq6wCWGGMs0di8mdkxsxNCiiAIZD5vJZVIf1y7s07KOeusNS4M1b90rLmidVLkYvxCJXseD6idbKb+IgPAkBBzeskLylZL8FbioBmhEUME4yPLk0ltLunBxc/LXnyH9yJlq3YG8ZVIC+BrjahTShEzP7R1a/xEqVQSxWJRpfta9E05RYjZWMOC6HdbW684Byi7PHy0wKBSKV1wmGUNG4MgfLUxicmMVA2sw6AQJEn1c1u23fHHmcGd9WLcOZvvkTMzrJRK5MYhCEKllEpDy1MIAxCR0jpxBPzJJZdctWwK8RHauXMnRRdE9QK4jUg0WusmtRhMy70E5ecjIhIiHYdSSmYv2nGlPQBUklSNkkF3Z+vaNTMLNY+OW1hrQEQXChK/5Zwd9WTHFh3sUucsD62nL/t0YVF2rJP/GYSFFxijNcaVqTETCZJCkbPmfm2SvzZav80YfZVJqtcbndzEzL9RKhDjDG/qVbNSQcACHwTA2b4jF4tFtW1bvBeEWCkFjN86SKM4YdhoE7xpbIzTk3vPksxlQRA2MHPtfWMhSGqd7LHQdwJASyXVIy4Wi4qFu1VIudw5a8YrQrGTUolABcI59zOtk29oo2/VRt9prf2REIImzZlIZFUjDCFvueSSq5Y1Nzfz448/nn8ul6TPYVAYfR6l2s9nllD77I7/CsIgCJVzNtjftZkOBeaRNDrhbe7BsqRal+jQJVMpZx/PpDvcBAaS733vc+ki7/BeIorj2F528YaTE9g1E1fjRGAiARKIgXQ1nofWBChm5942QUCDABilAgXNawH836mazx9hKIoiUS6XbWdb9GWlwk6tR6YyuCYICkGiq1/dvD3+/Zrkmzm8EEZfJBQEgTRaP+asfYCBpwFeTEQvEyQuBIGstRNr6sg5dmEYnpCM6MsAfH5Cwo3I9j3/VyEorKwmI2ZinWVe8mWtfkqb5IvsXJ8j/IYMGhzb8wm0IQjC3zVGIx9nfm5mFqkDJW6MLojOi+N4Vk0teCy7ivKxSKmklFJYa+Gc0czQABqI0ASkNdBtbW9uZDfyTmM0T1hAcGa791rLb928Pb5zqvN2dkZ/6az5glJBx4TEQJkd802dndFJcRw/DYBGQ8YW/2KFeRcwadGSRnGAqwF8Oo3iTJ8oOJpIyFjP7HLNghyrVKC0Tu7avv1rz0ZRJHdiJ+I4tu1r1v1RGBb+RzLhmWRmF6hAWGcfMY4+GNQNb7r77rtH98CjKJJ79vCrJdu/DYLwNVono3MmIuGcNUFQd1oyPNJdLpffu2rVKgkAxBzrZORRY6wDQTLAxFglpHxVbdlgdhw4x0M6qX6JiabYt2WWwpIT+CUw1jxhpiiABongRakOivQps2eOjPBvwhEiQtak3VtfIM2MFAQAQ11daTbl4azRzV7eNhHmsiAoNE3oKMQAlDHJiDT2biAPF6fp/5bCijPVJ6WUpzrnamt6yTkHB3QB+Ie5eIbzxa5du6hYLMo4jk1Ha/TPgSpEiR7RSMOWNbAJgoLSWt/7i19jQ03m8FzvDRMRE5ExVv8JBf03TaxJbW/vWi0YX0yvp3WoaRBOlKaFA/w6AJ+v2VPMwsobTgO5P9Ymcdm+4diJRw2uud3CvGfr1q/umjC2+wB8vKOt61oi8XGAVWYn0+xWImGtNUEYnrOXkncA+ORsQuwY/1nnMAilsfpHRtsvWaL7Q3a/tIYTEmKpAC0dO3aySkp5inXWIO2pnD5HxE6SlNbp39+8feOdU+01DwycS5s23fx0sXjlm+tD+5gQYklNi1Zyjm0QBIuMrl4I4M6aJh1iS2/8cPuadf+hVPCqNLSbGl8iyCyKc0F7+xUv3rKl/Mj0GeXp99vaorPAdKExhmsbBzCzcM5BEG4B0ueyUqnYzs6rFzuTfMBYzbX3Pze4xrmHBocHX//AA/fsBsaEP4DRPdL7oihavW+3/moQhJdprWsiHiS1rjoSdE1ra/ShbdvinwMlsfne8k0TR9/WFr0/mGx0mYhIkNu7adsd1xz4ts9e7EcB2EdIn3av5jA38qv2onPemzzymxsHhBDgKaofj1eImIUgCOJaMYTD5hW2VFpcBRVmpivTENTYapwZLhM3f3BT71d+Vju21Ov74mB7a/QNKdXvO5eMfjiJIK01LEicv2bN2vO3b9/43QPXex4e6uvr5aZNm6rtres+HAaFd6SJOZMNrlKh0sZ8u39o5E07d96VlMulgwx5kRMkhDb2qq33xncgzYAdZyy2bOnpbVt9xZUqCHonrkmZWXCaErESGBNaKBaLolKpOAHzB4GatGgaNbjG6K9v3hZvAIBVq1YFZ599tmtubuadO3fSrl27KFVE6rmpozXaJ6W6NfMMa0vBhLWWwfyeVauuualSuXm29dcMkJNSSG1NmeS+v59CCOOX2ZwUAAjLFxUaG0SSVEcjKcwMpZQcGRn+7y3bN36lJtw/4d5UkP7stmfaW9dVAhW+0Rg9em3SCA4xE50P4M5cGCa/niD6rBDiVVPMwyoVqERzF4C/ni6KkypHwcHhTUEYFGrvSx4iNkY/9uye5fejdo86SaKwEJ6SJEnt9gALIcg699xIkkQPPHDP7lWrrgkefvhmM/EzlddCX3LRVW+19eZHQogVNWV9BMAGQVjHOnkbgL8uFvvEihUR1SpSATACU8tApoOEKBbfuBTYMzBTRaqZohh41luHgyZfszDu4z1CUJoE6B1dAGkUJVuI7AaA7pUrqXzYzl4SZaSrcWJ6dRZyG+ddpZEJxABoqhcMgWLn3Dum0Gi2SinltIsAfHchdB7KFg3V9tZ1pTCoe39qcDHO4DLDBipQ1ppHaJgvefDBu/oPdiHEDBuGgdQ6uXHrvfEdURSFcRzriZ5isVhUW3u/cl/bmnUPBSq4cLyXRZQmZfGKYjFqrFTiAQBUqVRsFEVy73O83jnLE+4DC0HCWLPPovqHwKhClX744YcnDpOi5iiMt8W3ta+J1gVBeEWtlzTWwlGds3z5nt9F6lFNTDba3zVwQSCl1vo9W7bf8Qlki44VK1Zwc9zMZQCl0mjtKKeDx9PaJFusMYbB+TgsAUoQ9QKgLIS7vzEQMT8xjc9EBDy/9hujURmBjYmu/oMQYlmNh5x5qBZgrI+i6O+mW0jmoWcCZ+0xxxazROSklMJZe+vDD9+sc8nGSqUCJlyVl3XVkBr66vCHK5Wv/nLVqlXBww/fPGVJTl4WdE/l1t1ta9Z+uhDWlSYYfOGcZWK+AsDfTDSOxWIRlUrFdLRGB3jeQ1OTW3DIInOKyP0mvU6TMus8syGO09AQ4xkpvadbCxGxIAEm7AIObxP7fDUugMuDYPxqHGkoSWmth0mbuwFw7R5WpmOLxQN8394m8ysp5em1IdHRzFXw2lWrVpWOvDKVVKn6zto/CYNCt9bVcR4hkHogSgXSOvuL4aT6usoDdz6dCxQcxIlTw6eTQQv5t0BJxDEMpn9RkYB4UAhx4YQOL8je/XVK6QKAgTwkuu8Z92KS8lxrLSaUeqT7hkn19m3b7/p17gVNN06shMVOEAv6MDt3BYipdnGctnCURNZ2Arhv165dNJM9uxoJ0a9s2X7HJ3IvbeIzUZ6w2tyyLf4MgM9Md9woiuTOnTsxVXh5xYoVvGMHBABDJCYZKOZUXQnA8vz38x9lUZnn2tdEG1UQvFPrxGLUQyZhjHVSyua9e/WrADw4ncJVe/sVLxYsXpG2xxy3PyyN0QYOt+XnLpfL7uKLN5wMmFdZa2t72DIApU1iJAVxqnd8LqLo7GmTuJYtW0YAlIS8xxpTwrgcDSJrLYGoua0tesHWrfETpWzxPd3xDieKmX7prcPBkxsSBp5MPV2/iMlJK9wBgH4NHN4m9qOreof1E1fjWday1Frfv7ny1V9O4e1xsVhUcSUe7miN7pFS/UHtvm6auGGckupFJy07+1XAww8csRAzESTp37RdHK0Lg/CfsjDjxJpVFkIQO/6FTfTrK5U7f3ooxjt6HU2ybdu2L/96BsdkgJ+cybEff3yZAGBZ0KpQKaFrwqfZuYnZgUh8DbWJQtOQNwRY+iv+9t5TzU+lVC9IBTxIjB2PCYz/AaSJQlN195kIEYRz1pDjvwJAZ5+92z388MzUnEqlEgGpB5yFwQUAO1G/eRryn09roJgRTvczQfRZa+07MUGQhAhOSimsdlcBeHBiFGc0IuTkWhUEarynCRsEShqt79/ce8ejpVJJ7Ny5EwCgyL5cqqCxNumLmVlKRdaaJ765/fYfp2eoYHKgYvK8oyj6z73PuWekkCe6mhBzGs1RgTbJSgBP7Ix2prGsBYAC6Ge1smaeudEy9s9fZJm6PricQUg9GAH8Ajh8TexH9WY71q4kJ1ZNXI3noWUQ7sA0oeXRlzhT7Jy7ZnKImZwQUhhjNgB44EiEmIkgjNGOoa4RAr9njGZOleYmjsUqFahqMvzRrZWv/vCaVdcEN8dTh/Bmef70OoK2AaAZXoNZRQWI6CVTOAdZSYqpOsIPAXAc97gDfPJyLy9pPy36vhDiBdYSj4VFmZxzIODsVauuCcrlsj5Q+RAzrFJKGqO/s6V3444SSqIczzhykHfSoSiKqNYzbmt784qQqs9L2K0gFsuQeqzLAT4BjOUgWkbAMgCLGXhelpU9o1KnvAZ307aef29fs+4/lQp+pzbUD7Cw1gDsLr/00kv/LMsgHg2zZotZAmNdupgd/7kgIhDoFmDUQGc/wEuFEMjU4MaX7BDp9tVrL+S00mu/RolZE1HA+56FJOGqoy+ZfHmfi90IcTYw1uhkIaDAeILTVnQLsc7wqKEv/4ekJ7IPrSeDmYU2FpbFz4DD18R+1IgaEalQyalCy0mSDJHKQ8uVSeGnPMQ8YuofqKOhn0spnz8+6zZ7OYHeeMEF0Z9WKvEwDvEe0AwgACSlfKdzFvtZREtjDEuS77u0eOXnT2059Tk8PLsmA1OR7wFKwk5g5kpGszoH+IzJVzStYwX4aa0bsmzlA3/yxl7A/Hi2n19zZCJmBxCWn9rUvwTAMwd6YeeNMgh4AAD1FfsEDtzJZ5QJjRteqFhucHCvY06aHcTSUCggrYiomTrAqQo4kDV0qM3Gngl5SRYJ+hchxO9MuA4i6x99mh6hVgBfz0P9+Xjb2qLzBehl6WJ2NOSfLoQS/ZyqC+4CUgOd1/sScNbk60fCOQsCmkUQfGtGg6fMeVeAc2m/7tpM6NHL5OjkmV6Pw4WSJH5mna0KIQq1m+me2fF0bkiseKKaGDCz9MngKSRIDA0nTjj6OQAgOjxN7GsScNZlxqgmQzQNiTLrBy644GVPLV6sQqQhq0meQn9/v3rVq16Q/Nu3dn5TSnVtbYg5fTlZFwTBGYsWJS0ANtWUZhxWrDOO0pX+dA8eOedsGIbPS1z1/5XL5bel2a8HV1+cvjQdHNGzwOzrFvdHU9OjmSWhpamRGbc9kP0f3lup3DKS/cmMz02Mp6f6fpbhXq/rhpoAPDPT4zHosdmcHxgzuK2t0RIlqAymPxBKNsDROMH/iXvf6Tjz+8yUZWHP6oWTb72QRE+SJP9HCFpcawMo6x/NjDcDY0pt+WJWOKxTYSAmLGbThKgkueuee27dnW815AsxZpy0v8iqc5azAtYZzoVG/2fqn3LDzI5z+FCyfvCXbqT+KSJ6fppR5i3FXNixIzUkInA/qyZuWEpRby0z0fG9iGFmDpWiRNtnlsP8Mv1uNwPzm7+cf9j37HGvUDJYmYkxTBHNcTdl+7j766JjN23ahDVr1t5krfkDTNr/IkckiJy4EsA3D+U8ZgNNsdKf9DsEqXVigiB4a0dr122bt/VsPkT7uuAZNEY4CApTf5sAQnXs/8zc6DFheLqfESFAEk5zzgnHyRKWiNA/03MDNdsfq6NzhRBfUSpoTpIqUiF/5IlGEyUlefSs6Uizxh0s5vDuzkPtT7evie5UKnhLbUIVxvpHd4wJbJREpVK2URTJfc/xFc5OXMxy5rW6W6Y6IRHXZaPfj09ybNsgdffddw91rImeEEI+31rHx/Z054+8l+Kvq7956lR5yq8CpV5onT7uIwdEcEGgZGLMT09e/e6B0dKqeSYPCQqm9VJJOGdrXyapCIDRYIjfb1+zNiISBxSIIeLApmmXE+XfpDGGiPD61tZoSRzHe3H4Q8xTMeXzx8zCpe7GjcVi9LLm5uZx+3ULlP2WzMzlgMT7XaSwEHo+r4col8t88cXR6SRpqxDyedXqiM5UtlSNN29TL5cF0mYJBFAWbSYQKP2QZa3w5goL+mfn7FsmKq85xzYMw8XGJG8A8NnOzn8PNm1CdfduemUg5UusM7UJUVltrn20ap55ADiopvazGv403+NMBWxBkT50hJ2T9zY8s4R7enrk6tVlA+DRIFDY3+ba8QNxoCSIaAcA9PV1H45WklSpVExnZ2eBGZdnZT1TvmADFVwSBoUNgQo2hMH+v5QK105hcIEsbKtUcIIEOoCZt0WbR5zIZMAw4aWU7aHZIAjOKkj+u3K57BbAePcLM0am+wEx6jC3RcOU4ghEBGZoTcHU5zwElEolAOBA4J+VCp6ndaJrBf+BvLwrbXQghMoMmxth556zzv3UWPsDY819WuuvWGd3iLRH7qyuQZ5QtXQpf8tY+19KqXGaxtk4wMxXA8DPFy3K5FFdl5QSwFh7zKw2FyDcmtXSTvFM0SAB09oaIQQdii8iCkRaRrLgjG6a4g1890gP5FggysqGBPBdJcUl8GVDKURgdoftGRvdUzWNFykVvGCKZvWjZOIIMxU/mKp7DIDRlwgDfCWAnvlIJpoFuhDWBUky8k/MeCQMw89OUP8BAKW1tlKpP2pfvfb2Lb0bJ9ViLgQGBs4loAIiemaiY5CGTBhMtKxWTAMzFbMAT5tkQ8DgyEgwq3DxTMnroltb165RKujUOjFTLOY4CEJhrHnAOvNlYvzQET1LJPYGQ3Kg4VQ9GMfx6JZIZ+vav5EyXOncuPDwjBiVDF0T/asQ8kNEtqYsLtVwBtFFra1XnLMtjh8rFt9aBx56k50QWkZam6sd7G1AjS4zapLXGL+ZGD1OPWQprHOPs0uN+8FiybIzRgTMPwdqSgcXAKkUGdP30gzMmaWbe6ahJU2mcozvmNS7ojlGvo4lxMhIAoL4T6Am4WweyT/gjsUGJUab1U9pdKczotP87v6QaSMFar344g0nx/GXn8IRufl5A4OReNO2+M8AoKN13ZuDIFw9XqMWSFvQSSIpboqiaBXSPdkFGWZm8M+m+DY55wDGSUGgTgXwWKlUonyrZzpyY0BEL5osC8oshSQLu2vNmnP2PvDAOFGJQ4oEvW2arRYnhRTG2j/bvLXnn/Z3jKg5CnedtMvxfiQND8SoIIwyt2lNZSJqmpBUawMVBkiq6wH8XUEOvUYpddb4WlvYIAiE1sl927Z/5bFpFc4YP5n0vSwXihhu0/aeh+Y6jwOwYJ5pBQD7hkceaaoPJxYYe2ZJd3eaTGWV/d7A4EgiSYQ27Xx9XF5PZuYgUKJaTZ4ruOoOAIiiA0mvHTSUhraiJhBfNlV/z/k6b7b/1QRdvQzAZ9OSjMPZeShvYJBsGdG7rso8VzZs/pCs/B4RhbWZoVlbOhME4Uv3PTfywc3bN5ZmKfJ/+GDaMdFAAmNKUMboVwD4yQy6PVHWRL1p73M431k7oVySmIQAW/vjvNn6oczGRrbPmSUivcpaSxO8RaNUoIzRt27eFv9TFEUy141ubm7mVNFqdFHBWAlbiSu2ozU6be5mZbSp/JMdrdE9SgbrtdGjHnPeuICJrgTwtyC3dqpa22yfubY2d/Q+5AsXJ+l7Ez1kysq0GHh+W1t01tKl+PmuXc20YsXOA84ovSb7LXlbcItIla1I+jtao+8KKdusdm42q3/PGOVy2aVp/Nf//NH7P/1ooRD89tBwwjheM5gJrhAG0mjzg7NWv38Pl0oi+6DOG3lHoYKk1kAFJ0/07jKYD3K/PSvBn1wXmBqGDQD+OfWoDuYsM4eZXZh2DPp3R4Ur0nBaiaIoojiOf9xx8bruoFD4h4nNAgBIrbUVUv3F61qjO765Lf6vw92QYn9kyk5QznxHG06IEGKKBLHsmt92oOPltal7n6XWIFQnTXw+xgRT3INAGjU5xEYXADC8Sy1DYFakalo1QtIMSlcW7pZSqST6+vpoP4sgiuNmvmbVNcFP8dwF1hlkCVdzHRYR3Gcc8/pxRjFdnLEg0dxx8drXMIkWN5onkQrxCSGk1vrZEZ18HZgczs3r3ZOEv0+BeUoKeXKtglS2YA2rSfLaOI5vSeU8DxgSJgAoFqOmMCxwklTHTXzRomFX2xZwoSBG1UKY7vPJVAdPX19JpiEjfjAMAhAtqB6rh5ksiUqI+wAALfMvwDLWrN5dSRjfrD4nb4J9MF95Ysu42abKUCASF3V0rH9B6ikdWEIwJ4oiOTAwkNdbzuLNyU5KRdrqH4xoeenWrV8cTKUFyy6OYxdFkVx8An1I6+RhKZVintS4HIJEYJlvBkoikz1cEAvF9GVdEt/o/crPCPiOlIqZUZO8A2mMdkLIS1pb176iUqmYVauumbK5eKlUGrtnwn1gmoWXNEazcGnpV0tLyyH+/KaSj0PSFJgxaZxEEI4d2In+cnn/oe0oigKg7B5f/Oy6QIVnWuvsVAvBmZDv5Q/rZyrW6EeUnJxQBTBAdBOAs6yzqDmXVUqBga9VKnfumaZJBEdRJCuVeICArVIpxoQSs6wN4B/VXo7pxptpUXPHxev+tKk+/Alx9ZFCgMeyr0ea6tRjeqT+M8CE+74AGGvWLdCbu/1HelDHBITtjh3S6PJxCkNUEw0H7gWAeP73cymOY7tmzZtOIKIOMyG0nMn1sXPubmddq7XVTmts26y+rO10Nml11nxGqQATDRgAEwRBAcZdAQDYMbOoETGa4zi2Dz/8sAbypKyZwUwshSBrzF9UKrc9UywWVY2nykD6UmWBa51jm3kwNQlJkMYaE4aFC9rW/PC9cRzbhZTNXCz25fuGt9RkZI+SLhogFcl/XbPmTSc8/PDNulQqiWKxqGq/yuWyq1QqprM1+j+BCl9pjHHj97hhpVRwlh/adO/GH5QwHx5/1qfZJoOEKTOyrZQKTPwqoOz6+/sVxhZhBJREFEUya+yQrF59xZlKyQ85Z910mgBEcKVSSfT3n6KA6Q3QqEIV0S1CSkyISqWLMylfQhiv5ZzX5rKlz8/oEjB/1jlHY+Ie+eLJWKWCVe2t0f/Ks58zA167EKVVq1YFlUrFvOHCNywiId4HdicLojOkEKdIIU4h0OlSqVMY/GNgggzlAkDlbr8sDH03Ga77tZTyNOf8vu5c6etLV+HOyQf6B4aGpBQNx6NIBjNzGCgxNFx9yjr3HWD+93Pz0LKEuiQIwiVTZOwiDQzTJzdtu337wZyrY3X0S2vNOybKp+bN7Tltbv/hrKsNtKakLpiyZlBqrZmkuKqzLbpPO/1NIZpGCoU9PJvQWCrOQAxMFv3PjKjasiV+uGPNuv8XhIU/nyrMbLSxSsq/uWTNVXfes/3WJxZKmDnX+a0a3AokfymlGNftiYiEscYpFawMUbiv/eKud5fL5V5M2Nu95OLodCOoLJV8h9Zmqm0HEBERiX8AgHkSyWcAVKncubdjTfRzIcTytPn7aIhZWmNYkvizNWuuuGvTpq88Pv7PyxxnY+psjS4C0S1CiFPTBcREL5ezLkN0enYfJ/b2HUeeUOWE+JLW+q8Aqp+oDjVeAnW0rEkYY36UuKcfxH5qc2skJPvaW6MHgkBdVHsf0kiRsUrIv+9oXT+8edvtH5vqOA8//LCOokju243PK6VONSYxAMlMEpMBwdVq1Vh2X6id10JBYUyVZKijNeqTUl05l7RzT0q5XHZcKgkqXvvkI5Ub/qO+rtAyMDTsAFownsPhgIhsfV0otbb3vXT1uwe4p0cS0bym7WdZqUygDVOEDtPm4rr6m6oR36pNUJnteXbt2kUXvLb5sX97YMf3JgrFU97cXohXdKxeuzKO4x0ABPDrPeAVT5MQS5wb95KltNKIGoVQX5CMpwPhtB6pvxPAdVkYbTaGb8r55JKY+AXK+yi5XAp5jrHjXtTk2CEQQWNi9acBtO/cuXOheAj5O2qgfc26D0qpbnHOGoxL4iFhjHZKqWZJuLezLbrfOb6fiH4Bx4sh6OUG6FBKLdM6cUSTPo8mCAKltb53y/b4zsw4zMvzmnuUTNwrhDy/tkQHAFlnWUl1aiDUfZ3t0V+harbsqapnV4iqSgpihRPh+UIgAtBFJKjG4I4zkPleLJF4ecearpuDUH0/sfqhLVvih7PzTXiu8oSq23/RvibaFATBm0xNQlV21ElqbEJIAbJfyvvc7i8RL+/YJEB/ysz/RoJyAenMk2VpnWWlgo92tnW1OcsfC5LgO/c8cOveYrEownD5cqLwf/Tv4b9QSl2Y7slT7fhsEAQqSaq3bd/+lcfT+czPfZwrChgrsWDGXcx81f4lujwHpAUCZThm3K2UbKHjsFdxlrRNILoLOBw9dFOvrLN4+RlM1GKtoQleqJNSkXXunkolHkj3l+aWpZuHKjtao42TheIBZM3tDdt1AHYUi28NK5VbRtrXRN8VQvyWc5NLmJiZjdFMRCdJKWFdsnQuY9sPaZj5oXi4bXX0Lilpe62wATC6P2oKYdjW3rru7XEcf+5AHXYOF3nGbxzHn29fE60Nw8IbkqSaC0oAyA2vcUREUqrXKCVek/+MmWGtyeqyxxtcZnZCCGGdHYDEtZjnKN9oyZLkzxqj35tGX8ZllZOxhqWUpwuhPmsUDy5R/FyVwhDA8kCpAACM0XBjilCp1NvkbWpidpBK/UEQFKBN9b0AHi4Wi2KqBh+jfyPEZ8B8+eSuWuNgpJGaRFjx5dq5TcfYfex5qP3itX9fqKv/i0yJq3Z/m7ROXBCElwjhLtGkn+5YEz0LggLjRCnEUhAwefHEjkgIo/UgKfmXyBLNph3MEUIAY5lmVTO83Ri9VwiaaiPcM1NashWkwt0Dg8N5X9PjBmZmJaXcNzA0kCQjWwGgpaV7Xlebo/t+oXpjEAT1zGwwXt1HOOeIQAcdMMyTayTEV7XWk5ok5HtcjhGlRuunBgCEoC+kHu6UCTyUvTx1FsI75GU7eZh5a298rzX6M2EYygl70gCyxCTI/9fRcfmpcdzMWU/bI062FSYg8Xaj9SNBEAbMPC5kn11DMsZYrROTfxmjDTNPbLSeySwKklIKZ/XbtmyJfxJF0byG1fNSpM2bN+5wzt2Y3YeJ8yDnLGutLQnRKKR8nhDyZEAEWmubPXdMRCKfg3P8NKbJBzDGVLVOjNiP3jQwllC1dKnbro3+bymVYExMqEpJm4YEAHNlU+/t/z3T7Yg8uW/LvRs/mCTVrxYKdQGD81yGfP5Ca22NMU4IcZKU8sVCyBcS0VJjtJsoeJMmfZFTKhDW8bs3b779p1EUHXQHrflgtB1TuvK/+xmAt0k5ObPMM3OIyq5UKomXXHTdo8bYbzfUFwjg4+Z6EpFtaCgwgHtf1vq+p3p6IjnfesstldQQMmMDZ83qx36aKt4Ya34V7B66HxgrYZgL2YuFvrHt9h+B+WEpFdUarzSsZ52UcuXeZ7EqD7u96sKX3JPoal8Y1AXMSDD1wpYAEvOVgFepVGypVBJ1Rv+ZNsmvpRQTX6rkHLMK1HI26uNA2Z199u6FEvdioIQtW+LnXLXabp39XiGsC5jZTVw8ZMZVTfgaW4SBHcBGKSWFIJMkyVu2bP/KxixBad4/q7nhWbKc/jSpVh8qhIUwXUDULsiIiCCZmZ2zLs21SRcO+fcB1nV19dI5vg1wvx+oYMp3TX493P71pgGMKlQlIHxBSgnCfsv8iMG3AKP9qGcCx3HsSiXQM7uXrU+S6sZCWBcAwPjPEWS6qHBsrHHWGpcunEjUGFwG2AghRBCESifVD2y9N/7XhaiuljN6kcZCzOI2ADT+peWZLS1ZeYwgfDkMFPg4CjFnBoMc+DYAOOmk5nl9lkqlkiij7DpXr/8tQfQKY40hSiOK6RdpIZQVjLvvfvjuobzc4GDOOZrdK3ijIMEAzNj5YJmhhVAWAusAYMWKFaJcLrODulqbZEehUAgByo21mfw12bsgEjzhHDb7e5t5OzOZE+/cuZPurNy5B+z+SAhJAJkJx0OSJFWl1LqONWvfmMsNZtHL0fNN/BJiRudP55Imw045D0z2vmtIF7Rb7r/zF/sGhl+b2OSzSgUiCILcgzXpsdhhzOvLxO/ZpT9nJ4UUQVBQ7NwPrDYtW+/d+MUD7Ufm85/++s/qM85xHLs4jodVXfB6bZKthUJdQCRp7Nijc0BeGZ7lKpgs01oEQSFIkpEeEex7+5btG+/WJvl+EBQUM5IJY0yvywwWc/kC1rL7gjFaI43kTCoBEkJIbZJnHFHej3o2Ro7LZfDDD99sNm+L1yU6+WtB0k1zH7MEt9FrkC+yDIEoCAqKiPZUk+Rtm7ff8fczNbgk4Ob2DB4co0Z3LMTMm7XWv5FS+BDzQZBnMSOhjXv7B4ekIMV87F/PTIVK7usfelqF+hvA/IeW8xW2k+4ddXUNdVIqpVSggiCQQRDIQKmCEEIy7B3AoZH1y0PMwsmvObYUBEFh9Hyj5yRJjHcUi1FTHMdJqVSibdu+/Os9/Xtea3RyoyDaFwaBDIJQBSpUSgVKyaAuCEJFNFnWjwTkuHNkX0qpMAgCyWynrE+dSB5m3rxt41e01nfU1zWEqbD++PFLKUEkvtTRsf4F6V9yofZ8E7+Y3cyTL2n0WIWxeaT3DIRlxphpjUO5XHYllMSDD97Vv3lLzzudTVqds5uJiIMgVEEQSCGkSN/S+es6rc1Ofx4KBh4zJvnjoeQ3r8p1pw+8x89qf9ffufGlNDOAAYh77rl196atPR0mSf4EhF+FYSiDIJBSKkETUFKJILtODH7M2OQdm7b2rN+0aVMCgMjKtcaaHxbCQpiNTQZKSaWCOqWUJBIHbABQzhY227d/5XHn3NeVCqi2NjrDKqVAjK9u2xbvnaY2dybzBwCxeWtPyUC/2lp39+h9VGrsPtaQLjbSzw2IBqzVnzXsfmfr9viW2Xi4zKjfzzO4VOvqvDgLtR8STld68UB767oeKdV7fBbz3CmXy66np0ee29r1qx9Vbti0eFHD5f0DQ8f+9SSyjQ11as/ewTtedMF79/X2lhTRod+frCVfMArgG0mSfMc5w8yuZj9XEpnE/OJJeR8wtm91MOR7V9/cfvuPO1qv6BRCNaUNuGuwgGMh6utDMfY3JfHQQ+XnAFzX2Xn1/zFOF+FwHgOnAggIGK4m7r+dpS353PLEFFbhz4wZWTtxLESCEw2RWPntbH4HDJ3nZThBXXCN1vq2qa4Za+OCQAYuYQkAjsS/JYlex2xc7e+mKAgVPJHNc9qXb36vnMbXTFB9wrmJx1IAYFasqN+XD2Wq45TTvTrKmltsB7D99W3R+drYS8HutQC/CMByZhQIsGDut+Cfs7PfZuCbw0n91rzx/YEylfP5VKvJf1Mg1qbBiDGIBCcJBCT9R+0cZ4hDJlX4zW09H7rkkqv+xST2DUTc6ZhfBsYpADdkya1Djt2vHbv/BOjrTz83eM/DD989VEJJlLP63029t//3pasufZU5sen3wLzGOneyACxAP7XWfmM4wTcB0IHGOCrjKPDI1KJJLKy1IJphbe70MMay0/8dwGWdaza83Fj9Bma8BowXAnwCM0IidmAaYmGfgnE7WNC9wuhvfKP3Kz8DxnpoH+iEo3MXuNWY6g8mPoNSKgBUDYK9+f73IXWWxn1w8kG3r778PKGC/8zDhIfyhEc5TETkmPuZzAu3bv3qLmB6bU/mHknUZX/8wE3t9YVg88BQ1U2s6zzWYGYOQwWX8CvOKV77nz09kezqWph7K0eQ3Fj463IIyLJhHWq2cDo7OwtBsnSpZVFHDdpYG/Zv2vSlfZP/Lq4J4R5ZpjAa1N4eLQNEY+gcKa4b/Nr2Lzy7/78pHYrkIQKA6IKobl8jPyqkfF5tfW5Nbe6OJcvpvEN1DXPlqNpkrGLxrXWNGFoKYQsmCFwQyIF77rl1T+350mvQzAsxaWoqJhnUPAOtvXVdb6CCotbGazGPMSujC6T7m3193fJkcfIPGuoKLx4eSfhYNbwMtk0N9aJ/YPhbzS3XvYZLJUGHUVwh06oVK1as4NFWYhkrVqzg+TJyec3vVD/b/3lLIs+6zn83P05LS4ubIhN0yj69+d9lK/jZvvyoWCzK6a7ZhONO+7vAqAcxw/Oncz+U9yq//9NcO9SOf46GYj6u//7GOOU1yMu49jOHmmM0c6mUeq4znXe+t93RGnUpFdw+hX65CYJQaaM/sHlrz98f6iYZM7iPo5+5VPhiru+YQ/8MzoRJH5z8ArZf3PWmIFRfnUYw/nhl1ka3t7ekVq8um0fuv+H6JYuaPrln36ChYzTEzMx28aIGOTgwHL3ote+6I5/7kR6X57gke7eVsv+WZyWtuUCYag7APM8j95471qy7VwXB6gnqXXliV+KIX7J1a/wESiWB+VtcH5FrMJ9MFzqmVauuUScufe4HUqlzM5myY9I7myVz8nQBwuPbblqsQ/djFciTjLGMafq7Hq0w4OoKAY2MJD+xT5340pVRpCdq/Ho8noXDxLaBALBz504Vx3HS0bF2Jbng+8xWYFy9+2jf3C1btt/RuVCkQo8mpvS4Upmym3VH67oPCSE/A1h/UecIEXFvb0mtbrt2748qN97Y1FhX2r130NKxZnSZub4QipER8+GXdnUlvb0lhYkZJx6PZ8EwTfg0LQ8z4kNSkdQGU0U6SQj8KzC5b67nwExpdPPMxr0D9KXFjdUPSqnOdM6ME7r2zJy+Pjhmpu/e//FPiX30HiXFUmNsrf7uUQ0Dri4MxJ59Az9f3Cg/n3n3PknI41l4EABeteqa4MSlu/+3UPJJ49xOAM8BgGA+G4T3CKHW6FT1qdbgOimF0Dp5smrobswgC9ozmemMKBeLRfnQQ/EwMf6vlJKYjx9xh0NNuVx2fX3d8nde+96nneVPLmqqJ8yz+P/hhJm5ob5AjvGPp7/i2qG+vm7p+zJ7PAsbBv9RoMIbFVFFMP+XYP4vKdWdUqg1E2UWs79wSgZEEJ+oVOKBLKnMf85nybSea7qCKQkKB/5VJ8ljUsopmhp7ZkpLS7dlZrKh+ujefYPPhIE6JsIyzHD1hVDs3jv4eL2r/2ypVBItLQurq4fH45kMgZ7ROjGW7eg2kDHGpl2zxhvctCmEkomu/qLQOPJJAMJ7uXNjf+FijqKdtGnTpioDf5nJxflVzRwhIu7r65YvvfAPnmPG/2msL0wrJH50wVwoBATmvzxr9dtHWlogvJfr8RwVpJrUXNsiMdV1rv0lBjsSwgkhyDl37V133dUfRdF+E0g907PfPdq8DdOW7XGPNsm/BUpN1ZXEM0NaWsqWuSQKtu7GPfsGHqsvhHIKebWjBgbbxoY6uWfvwH+8uPiu23p6IulLhDyeo4ZM33laZyptJgAhAhWqJEn+fOu9G7+5kJsJHA3MuCsEk3u/Szs8zOuAjmWIwIhX0lmr3z7CDn+ilJquzdtRgSCCdQ5EeH8q9h4d6SF5PJ6ZQlimlBKZZ8t5I4HcsRIkKAgKSkgaTHT1uq333vGP3uAePAc0urm3u3Xrxn931vxz1gXCezNzhLq6bE9Pj3xJy3V37e0fumfxogbJfPS1/WNms3hRoxwaTj73kuL1DzL3yK6urqNuHh7PcQidffZux4wvWmN2gjEgRhtCKJk1RoAD/9JafbNh/Yot2+IbvcE9NMzUbRWlUgkPPPD4MiWqOwToJMcWx2EJ0azFMaY8CJcE0M0/fuDGs6RQ/wXigtZWHEUlRC4IFJyzzzYUqPm0r//6uW6M10z1eDxHBdTauuHUADiNSS9nFnVSIHFWPmWF+vHWrV8cBGbeTMBzYGb8ks8vetvF6zYUwvA2bbTBMSpnuB8OidEFxpoh/LD3k+8/cfniD+/eM2CI6Gi5nmbJoga1Z+/g1S9pue7WfC5HelAej2fmzMSQRlEkm5ub2S+oDx2z8qxGNTlb190RBIW1SZIcb7rMh8zoAiDu6RGIIvfIfTfet6ip/qL+gWE7oRh9weHY2WWLm+SefYNffUnxuiu8vrLHc1RDQImiaOc4W5AZ2qNRr3rBM8twZtp6qa3tBydKBD8gohXW2uNJl/lQGl0wlwRR2e3ou/GculB+l4E6rc2CDTMzwxVCBcv8zPDQ0Ms23r/7acCHlT0ej2emzNJYll0U7aStW7+6yzn7TiEEEZF/4c4RorJj7pErW9712NCIfm9jQ52kBaxUJQRcGChhEv3Ol7W+76nulSvJG1yPx+OZObP2UOM4tsViUW3ZvvFunSQfDoOCAtiHF+cIUZft7S2p3774+s/u3jPwpaWLGxXzwruejtksXdyk9g4MfeQlLdd/vbe3pMhnK3s8Hs+smGsYk6IoEgCw7zlUVBC8+jjpu3tIw8ujB2UmoJt+8/3fqh8YGP6PMAyah4ZHFsz+rmNnFzc1ysGhkW+96KLlRcQAosiltbkej8fjmSlz3Yvl5uZmjuPYKsZ6a+1vpBTSazPPjdx4nXr+7w1WR0Yia+1AEChy7sgLZzCzqwtDOVJNnhox1Q1EXRY7drA3uB6PxzN75pwAVS6XXRRF8p5741+xNV0AGSLhs93mSL6/+9LW9+4cHkneUgiVUEpY5iN3PZmZlZJMgszgcNJ13ur3/pJ7eiT5fVyPx+OZEweVdZzv726+d+P9WptrlFIS8NrMc4Woy3JvSa1cff3X9g0M//niRY1K0JFR/2IAQgjbWF+Qg0PVa85b8+772O/jejwez0Fx0KU+lUrFFItFta33js9pk3QHQUEB0IdgbMcltLpsuLekVrZc/4+7d+/71NKlTQGYD/v1JEAvXdyo9uwb6n7p6us/x70lRb4e1+PxeA6KQ1JfmxveLdvuKGtdvTEMCgFw+A3FMUNL2XJPj3xJy/Xv3rN3IF62dFHAh9PwMutlS5uC5/YM3Njccl3ZG1yPx+M5NBwyUYtKpWKjKJKbt8XXJbp6axDUecM7R4jAiCLHXBK/Nr+5am//0KZlS5oOi+FlZr1s6aJgz97BL72k+K7rmHskfFN6j8fjOSQcSiUpjuPYlUolsXlb/BatqxvD0BveuUJE3N2d9uB95tcDV/QPDN8774aXWS9fuijYs29w44suuvYtaWOGyPmm9B6Px3NoONTyjVwulwEAi5dhvdbVjaH3eOdMuVx26C7RhV3/c3hwcN8b+oeGt8+b4c083H39Q3d8/8nt67u7uwno9qVBHo/HcwiZL43f/LjU0Rp9PgwLVydJ9VjoSjQv4hgHPGmm0dzbW6o7o3D6HYsb6y/Zvadfgyg4+GMDIJjlS5rUvoGhL77w1df+HrLyYG9wPR6P59AyX40KRl/Wm7fFb06S6g1BECpmWODICz4cbRCVHZdKYvXq8sgvN//qTfsGhm5dtnRRAMAwz/16MjMTwS5b0qT29A986pxXX/uW7lKJ0nN6g+vxeDyHmvnsDsQAONvjvT7R1e4gCCQg4JWrZg+Vy65UKomW7m57zquvvXpP/8BHlyxuVIIEM2PW19MxOyEEmhrr5Z59/X917kXvejdzSXR3+5Cyx+PxzBeHo4UcRVEk4ji27a3r3i6FvAlAYK07GrWaj0h4edwAmCmOu0RXV2wfuf/T76sLg48Ya6G1mbFWM4NNXRgqAMlwNbmmuXjdLcw9EujySVMej8czjxyOPrg82plo2x2f0861MfCr1OtdeN10FjpExF1dsevtLakXv+YPPzo0VL1MCPFcU2O9nEl3ImY2i5saFDP/cmgkaW0uXncL95YUUZf1Btfj8Xjml8PWfH5UuWpbXHHDI79rrekLgjrFzM6Hm2cNr86Uq5pXX3d3/2D/hUmiv7Ns6SLFYOum2OdlhmOGW750kRoZ0ffu2j30uytbrru/1wtfeDwez2HjsBldIDW8URTJLfff+YtNS7nV6OSflAqElFJ4r3f20Oqy6e0tqfPWvP/Rn1d/9ZrBgaFPL25skGGgyLEbFbRgZlMIlWioD8W+/qF/+PzmX7Zd8Pq0ecFqb3A9Ho/nsHE49nSnoCSAMgPgzrauywh0g1TqjCRJLMCCiI7QuA7IEd/TnXJQWUkRADx6341XBoH6eKEQnLivf8gAoKWLG+VINfl5UnXXnVu89h5mJnR3k+8W5PF4PIeXw+rpjpG+7IvFotq0tefrQ4l7pbXmy0EQSCklea93dqRtAUHMPfLc177rtr0jA6+sVpOvL13cqBY1Ncihoeqte/fqV55bvPae3t6SIiJ4g+vxeDyHnyPuUUZRJOM4tgDQ0RpdKUj+g1TyeVonzAy3wDKcF6SnW0tvb0nlIeMfP/DpP3TODb74tdd9AQC4p0f61nwej8dz5DjiRjdjtKyo86LoJKqnMoj+UJAgbYzNbN0R8srHseCNLgCUSuPrbblUEvD1tx6Px3PEWShGF8B4r7e9ff2FgvG3UsrV7ByMtQvB+B4VRjeHuUciBrx36/F4PAuDBWV0M0a9XgDobOvaAKIPKKl+21oLe2SN71FldD0ej8ezsFgIIduJcBzHtlQqCQC0aWvPlxctca8w1lzL7B4Jg1AqpURa3wsLb/A8Ho/Hc5SwED3dcdSGnIvFt9bVhyNXg/BuKeT5AGCMBgADsADm3fv1nq7H4/F45sxC9HTHkRlciqJIViq3jGzaevtnFy1xr3DOXG6t3URELghCJYT03q/H4/F4FjQL3tOdwLj9XgB4fVt0voN4M4PXKanOBABrDZzjTEv4kHrA3tP1eDwez5w52oxuDkVRJJqbm7lczoU2oqb6ULYxcxfAa5RSJxEI1hk45xiAZQYRgTB3D98bXY/H4/HMmaPV6I5SKpVEX1+fqFQqoypWlxavPNGE3AJ2lwDcQkK8QEoFZoZzFs45ADAAkBpiJoAIB74e3uh6PB6PZ84c9Ua3BoqiSACj+8AAgOiCqH7fEpxPLIrs3GuJcB6ROE1KBQCZIXZgdmBmpB2PakUkmGq0oHOjO+CNrsfj8Xhmy7FkdGuZ0gADaRi6ro5eJCzOY+B8gJsZOBvAyUTUKIREamMZaYM8BjMDDDDS+LRzbtCROdsbXY/H4/HMhmPV6NZCURSJXbt20YoVK3iiEQbSUqQmpU/T0pwJhxcQ85kgfh6DTgbzCQQsAVEjGHUQFDLzsFA4b9Om+Gl4o+vxeDyeGfL/AbKzOi1+Z2iNAAAAAElFTkSuQmCC" alt="Alkhorayef Petroleum">
+    <div class="title-block">
+        <div class="company">ALKHORAYEF PETROLEUM COMPANY</div>
+        <div class="sub">Global Operations Support (GOS)</div>
+    </div>
+    <div class="doc-info">
+        <div class="doc-no">DOC No.: CALC-GOS-ESP-001</div>
+        <div class="rev">Rev. 1.0 &nbsp;|&nbsp; Sep 2026</div>
+    </div>
+</header>
+
+<!-- ============ TITLE BAR ============ -->
+<div class="title-bar">
+    <h1>ESP BENDING CALCULATOR</h1>
+    <h2>Maximum Allowable Length &nbsp;|&nbsp; DLS Calculator &nbsp;|&nbsp; Stress Analysis</h2>
+    <div class="subtitle">4-Method Analysis Suite per TB-GOS-ESP-DEV-001 Rev. 0</div>
+</div>
+
+<div class="container">
+
+<!-- ============ CONFIGURATION SECTION ============ -->
+<div class="section">
+    <div class="section-header">
+        1. Configuration &mdash; Casing, Tubing, ESP, Material
+        <span class="badge">Setup Required</span>
+    </div>
+
+    <!-- Live config summary bar -->
+    <div class="config-bar" id="config-summary">
+        <span style="color:#948984;font-style:italic">Select casing and tubing to compute</span>
+    </div>
+
+    <div class="section-body">
+        <p class="reference">Ref: API 5CT (Casing &amp; Tubing) &nbsp;|&nbsp; APC Alkhorayef Housing Materials Registry &nbsp;|&nbsp; TB-GOS-ESP-DEV-001 §2, §5</p>
+
+        <h3>Casing &amp; Tubing (API Standard)</h3>
+        <div class="input-grid">
+            <div class="input-group">
+                <label>Casing Size &amp; Weight <span class="unit">(per API 5CT)</span></label>
+                <select id="casing-select"></select>
+            </div>
+            <div class="input-group">
+                <label>Tubing Size &amp; Weight <span class="unit">(per API 5CT)</span></label>
+                <select id="tubing-select"></select>
+            </div>
+        </div>
+
+        <h3>ESP Configuration</h3>
+        <div class="input-grid three-col">
+            <div class="input-group">
+                <label>ESP Series (Housing OD)</label>
+                <select id="esp-series-select"></select>
+            </div>
+            <div class="input-group">
+                <label>ESP OD <span class="unit">(inches — auto or override)</span></label>
+                <input type="number" id="esp-od" step="0.01" value="5.38" min="1" max="12">
+            </div>
+            <div class="input-group">
+                <label>ESP String Length <span class="unit">(ft)</span></label>
+                <input type="number" id="esp-length" step="0.1" value="31.15" min="1" max="200">
+            </div>
+        </div>
+
+        <h3>Housing Material &amp; Ovality</h3>
+        <div class="input-grid three-col">
+            <div class="input-group">
+                <label>Housing Material</label>
+                <select id="material-select"></select>
+            </div>
+            <div class="input-group">
+                <label>Yield Strength <span class="unit">(ksi — auto or override)</span></label>
+                <input type="number" id="yield-ksi" step="1" value="75" min="30" max="200">
+            </div>
+            <div class="input-group">
+                <label>Elastic Modulus E <span class="unit">(10⁶ psi)</span></label>
+                <input type="number" id="modulus-Mpsi" step="0.1" value="30.0" min="20" max="35">
+            </div>
+        </div>
+
+        <div class="input-grid three-col">
+            <div class="input-group">
+                <label>Casing Ovality <span class="unit">(% — SPE-74560 default: 3%)</span></label>
+                <input type="number" id="ovality" step="0.5" value="3.0" min="0" max="10">
+            </div>
+        </div>
+
+        <div class="callout gold">
+            <div class="callout-title">Standing Assumption — Housing Material Impact</div>
+            <div class="callout-body">
+                Carbon Steel (K-55 equiv.) yield 55 ksi vs. 4140 Modern Alloy yield 75 ksi — a 36% capacity difference.
+                Verify housing material against equipment records before finalizing analysis. Default: 4140.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ CALCULATION TABS ============ -->
+<div class="section">
+    <div class="section-header">
+        2. Calculation Suite
+        <span class="badge">Interactive</span>
+    </div>
+
+    <div class="tabs no-print">
+        <button class="tab active" id="tab-config"     onclick="showTab('config')">Guide</button>
+        <button class="tab"        id="tab-max-length" onclick="showTab('max-length')">Max Allowable Length</button>
+        <button class="tab"        id="tab-stress"     onclick="showTab('stress')">Stress Analysis</button>
+        <button class="tab"        id="tab-dls"        onclick="showTab('dls')">DLS Calculator (Survey)</button>
+        <button class="tab"        id="tab-methods"    onclick="showTab('methods')">Methods &amp; Equations</button>
+    </div>
+
+    <!-- ================ TAB: GUIDE ================ -->
+    <div class="tab-content active" id="content-config">
+        <h3>How to Use This Calculator</h3>
+        <p>
+            This tool implements the 4 industry-standard methods for ESP bending analysis in deviated wells,
+            per Alkhorayef Bulletin <b>TB-GOS-ESP-DEV-001 Rev. 0</b>. Each tab addresses one calculation.
+        </p>
+        <ol style="padding-left: 30px; line-height: 1.8;">
+            <li><b>Configure inputs</b> above — casing, tubing, ESP series, material. All downstream calculations use this state.</li>
+            <li><b>Max Allowable Length</b> — enter target DLS, get max L from all 4 methods with a chart.</li>
+            <li><b>Stress Analysis</b> — enter DLS, get bending stress σ_b with traffic-light banding (Recommended / Caution / HiStress).</li>
+            <li><b>DLS Calculator</b> — enter multi-station survey (MD, Inc, Az), get DLS per station via minimum curvature (API RP 78).</li>
+            <li><b>Methods &amp; Equations</b> — reference documentation for each formula with derivation and applicable conditions.</li>
+        </ol>
+
+        <div class="callout">
+            <div class="callout-title">Compliance Note</div>
+            <div class="callout-body">
+                All 4 methods are applied in parallel per Alkhorayef standard practice. When methods diverge,
+                the most conservative (shortest max L / highest σ_b) governs. For any DLS &gt; 6°/100 ft, FEA (ASAP)
+                is mandatory regardless of closed-form results (TB §8.2 Trigger 2).
+            </div>
+        </div>
+
+        <h3>Bulletin Engineering Positions Summary</h3>
+        <table class="data-table">
+            <thead><tr><th>Domain</th><th>Alkhorayef Position</th><th>Reference</th></tr></thead>
+            <tbody>
+                <tr><td class="label-cell">Operating DLS at PSD</td><td>≤ 1°/100 ft with 150 ft continuous tangent (REDA)</td><td>§6.1</td></tr>
+                <tr><td class="label-cell">Closed-form analysis trigger</td><td>Any DLS &gt; 1°/100 ft in pass-through</td><td>§7.2</td></tr>
+                <tr><td class="label-cell">Formal FEA trigger</td><td>Any DLS &gt; 6°/100 ft in pass-through</td><td>§8.2</td></tr>
+                <tr><td class="label-cell">Recommended stress band</td><td>σ_b &lt; 20 ksi</td><td>§9</td></tr>
+                <tr><td class="label-cell">Caution stress band</td><td>20 ≤ σ_b &lt; 35 ksi</td><td>§9</td></tr>
+                <tr><td class="label-cell">HiStress band</td><td>σ_b ≥ 35 ksi (do not proceed)</td><td>§9</td></tr>
+                <tr><td class="label-cell">RIH speed AGC ceiling</td><td>300 ft/hr (≈10 Jts/hr)</td><td>§10.1</td></tr>
+                <tr><td class="label-cell">POOH speed AGC ceiling</td><td>240 ft/hr (≈8 Jts/hr)</td><td>§10.1</td></tr>
+                <tr><td class="label-cell">Multiple methods</td><td>All 4 applied in parallel; conservative governs</td><td>§7.2</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================ TAB: MAX ALLOWABLE LENGTH ================ -->
+    <div class="tab-content" id="content-max-length">
+        <h3>Maximum Allowable ESP Length — All 4 Methods</h3>
+        <p class="reference">
+            Ref: TB-GOS-ESP-DEV-001 §7.3 (APC L_a) &nbsp;|&nbsp; SPE-74560 &amp; SPE-181225 (Camilleri/SLB)
+            &nbsp;|&nbsp; SPE-179121 (PCM) &nbsp;|&nbsp; LEX Cross Training
+        </p>
+
+        <div class="input-grid three-col">
+            <div class="input-group">
+                <label>DLS <span class="unit">(°/100 ft)</span></label>
+                <input type="number" id="max-len-dls" step="0.1" value="6.0" min="0.1" max="30">
+            </div>
+            <div class="input-group" style="align-self: end;">
+                <button class="apc-btn gold" onclick="calcMaxLength()">▶ CALCULATE &amp; PLOT</button>
+            </div>
+        </div>
+
+        <div id="max-len-results" class="results-grid mt-20">
+            <div class="result-card"><div class="label">Click Calculate</div><div class="value">—</div></div>
+        </div>
+
+        <div id="max-len-compare" class="mt-20"></div>
+
+        <h3 class="mt-20">Max Allowable Length vs. DLS — Method Comparison Chart</h3>
+        <div class="chart-container">
+            <svg id="chart-svg" class="chart-svg" viewBox="0 0 900 480"></svg>
+            <div class="chart-legend" id="chart-legend"></div>
+        </div>
+
+        <div class="callout">
+            <div class="callout-title">How to Read This Chart</div>
+            <div class="callout-body">
+                The gold dashed horizontal line marks your <b>actual ESP length</b>. For any DLS on the x-axis:
+                if your ESP length is <b>below</b> a method's curve → PASSES for that method.
+                If it's <b>above</b> → FAILS (excessive bending).
+                Vertical reference lines mark bulletin-critical DLS thresholds (1°, 3°, 6°/100 ft).
+                Methods can diverge significantly (up to 30-40%); the conservative one governs.
+            </div>
+        </div>
+    </div>
+
+    <!-- ================ TAB: STRESS ANALYSIS ================ -->
+    <div class="tab-content" id="content-stress">
+        <h3>Bending Stress Analysis — Closed-Form Per Method</h3>
+        <p class="reference">
+            Ref: TB-GOS-ESP-DEV-001 §7.3 Eq. 5.2 &nbsp;|&nbsp; σ_b = (E × OD × DLS_ESP) / 137,510
+        </p>
+
+        <div class="input-grid three-col">
+            <div class="input-group">
+                <label>DLS in Pass-Through <span class="unit">(°/100 ft)</span></label>
+                <input type="number" id="stress-dls" step="0.1" value="7.77" min="0.1" max="30">
+            </div>
+            <div class="input-group" style="align-self: end;">
+                <button class="apc-btn gold" onclick="calcStress()">▶ CALCULATE STRESS</button>
+            </div>
+        </div>
+
+        <div id="stress-results" class="mt-20"></div>
+        <div id="stress-callout" class="mt-20"></div>
+
+        <h3 class="mt-20">Interpretation Guide</h3>
+        <table class="data-table">
+            <thead><tr><th>Band</th><th>Stress Range</th><th>Meaning</th><th>Action</th></tr></thead>
+            <tbody>
+                <tr style="background:#D8E4CE">
+                    <td class="bold center">Recommended</td>
+                    <td class="center">σ_b &lt; 20 ksi</td>
+                    <td>Fully acceptable operating envelope for standard 4140 housings.</td>
+                    <td>Proceed. Standard mitigation controls per TB §10.</td>
+                </tr>
+                <tr style="background:#F5DDBE">
+                    <td class="bold center">Caution</td>
+                    <td class="center">20 ≤ σ_b &lt; 35 ksi</td>
+                    <td>Elevated. Approaching yield for CS; still &lt;50% yield for 4140.</td>
+                    <td>Full mitigation package. FEA verification recommended. GOS notification.</td>
+                </tr>
+                <tr style="background:#F5D0CD">
+                    <td class="bold center">HiStress</td>
+                    <td class="center">σ_b ≥ 35 ksi</td>
+                    <td>High risk of body/hub failure. Approaching CS yield.</td>
+                    <td>DO NOT PROCEED without FEA. GOS Engineering approval required.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================ TAB: DLS CALCULATOR ================ -->
+    <div class="tab-content" id="content-dls">
+        <h3>DLS Calculator — Multi-Station Survey (Minimum Curvature)</h3>
+        <p class="reference">
+            Ref: API RP 78 &nbsp;|&nbsp; Minimum Curvature Method: cos(β) = cos(I₂−I₁) − sin(I₁)·sin(I₂)·[1−cos(A₂−A₁)]
+        </p>
+
+        <div class="input-grid three-col">
+            <div class="input-group">
+                <label>Survey Units</label>
+                <select id="dls-unit" onchange="computeDLSTable()">
+                    <option value="ft">Imperial (ft)</option>
+                    <option value="m" selected>Metric (m)</option>
+                </select>
+            </div>
+            <div class="input-group" style="align-self: end;">
+                <button class="apc-btn" onclick="addDLSRow()">+ Add Station</button>
+                <button class="apc-btn gold" onclick="loadRUNIBExample()">Load RUNIB-112 Example</button>
+            </div>
+        </div>
+
+        <div class="callout">
+            <div class="callout-title">How to Use</div>
+            <div class="callout-body">
+                Enter MD, inclination, and azimuth for each survey station. DLS is calculated between consecutive stations.
+                First station shows "START" (no prior reference). DLS_100ft and DLS_30m are both output.
+                Band cell auto-colors per Alkhorayef thresholds. Use "Load RUNIB-112 Example" to see a worked case.
+            </div>
+        </div>
+
+        <table class="data-table mt-20" id="dls-table">
+            <thead>
+                <tr>
+                    <th style="width:5%">#</th>
+                    <th style="width:15%">MD</th>
+                    <th style="width:12%">Inc (°)</th>
+                    <th style="width:12%">Az (°)</th>
+                    <th style="width:14%">Dogleg β (°)</th>
+                    <th style="width:14%">DLS (°/100 ft)</th>
+                    <th style="width:14%">DLS (°/30 m)</th>
+                    <th style="width:14%">Band</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="center bold">1</td>
+                    <td><input type="number" step="0.1" placeholder="MD"></td>
+                    <td><input type="number" step="0.01" placeholder="Inc"></td>
+                    <td><input type="number" step="0.01" placeholder="Az"></td>
+                    <td class="center">—</td>
+                    <td class="center">—</td>
+                    <td class="center">—</td>
+                    <td class="center">—</td>
+                </tr>
+                <tr>
+                    <td class="center bold">2</td>
+                    <td><input type="number" step="0.1" placeholder="MD"></td>
+                    <td><input type="number" step="0.01" placeholder="Inc"></td>
+                    <td><input type="number" step="0.01" placeholder="Az"></td>
+                    <td class="center">—</td>
+                    <td class="center">—</td>
+                    <td class="center">—</td>
+                    <td class="center">—</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================ TAB: METHODS ================ -->
+    <div class="tab-content" id="content-methods">
+        <h3>Method 1 — APC L_a (Dr. Lee, January 2023)</h3>
+        <p class="reference">Ref: TB-GOS-ESP-DEV-001 §7.3 &nbsp;|&nbsp; APC Application Engineering internal derivation</p>
+        <div class="equation">
+            <span class="eq-label">Formula</span>
+            L<sub>a</sub> = 0.1667 × √[(ID − OD) × (137,580 / DLS − ID + OD)]  &nbsp;&nbsp;&nbsp; [feet]
+        </div>
+        <p><b>Basis:</b> Uses nominal casing ID. Assumes rigid ESP body deflection to contact both ends against nominal ID walls
+        of a curved section. Constant 0.1667 embeds unit conversions (DLS in °/100 ft, dims in inches).</p>
+        <p><b>When to use:</b> Primary Alkhorayef method for initial screening; conservative in most cases relative to drift-based methods.</p>
+        <p><b>Metric form:</b> L<sub>a</sub> = 0.0508 × √[(ID − OD) × (137,580 / DLS − ID + OD)] &nbsp;&nbsp; [meters], both ID/OD in inches, DLS in °/100 ft.</p>
+
+        <h3 class="mt-20">Method 2 — Camilleri / SLB (Eqs. 1, 2, 5.2)</h3>
+        <p class="reference">Ref: SPE-74560 (Camilleri 2002) &nbsp;|&nbsp; SPE-181225 (Camilleri 2016) &nbsp;|&nbsp; Baker Hughes ASAP methodology</p>
+        <div class="equation">
+            <span class="eq-label">Eq. 1 — Zero-bend length</span>
+            L<sub>zero</sub> = 2 × √[(R + ID<sub>eff</sub>/2)² − (R − ID<sub>eff</sub>/2 + OD)²]  &nbsp;&nbsp;&nbsp; [inches → convert to ft]
+        </div>
+        <div class="equation">
+            <span class="eq-label">Eq. 2 — Residual bend transferred to ESP</span>
+            DLS<sub>ESP</sub> = DLS<sub>casing</sub> − DLS<sub>zero</sub>
+        </div>
+        <div class="equation">
+            <span class="eq-label">Eq. 5.2 — Bending stress</span>
+            σ<sub>b</sub> = (E × OD × DLS<sub>ESP</sub>) / 137,510  &nbsp;&nbsp;&nbsp; [psi],&nbsp; E = 30×10⁶ psi steel
+        </div>
+        <p><b>Basis:</b> Uses drift × (1 − ovality%) as effective inner clearance. R = 68,754.94 / DLS (radius in inches).
+        Standard SPE ovality assumption: 3%. Accounts for real casing geometry, not idealized nominal ID.</p>
+        <p><b>When to use:</b> Rigorous stress calculation. Baker Hughes ASAP FEA uses this framework. Most widely accepted industry method.</p>
+
+        <h3 class="mt-20">Method 3 — PCM Skoczylas</h3>
+        <p class="reference">Ref: SPE-179121 (Skoczylas)</p>
+        <div class="equation">
+            <span class="eq-label">Formula (solve for L)</span>
+            L = √[1,500 × (ID − OD) / DLS]  &nbsp;&nbsp;&nbsp; [feet]
+        </div>
+        <p><b>Basis:</b> Simplified moment-balance approach. Uses nominal ID. Constant 1,500 embeds unit conversions and material stiffness assumption for ESP-typical geometry.</p>
+        <p><b>When to use:</b> Quick sanity check. Generally less conservative than APC or SLB for large ΔD.</p>
+
+        <h3 class="mt-20">Method 4 — LEX (arcsin)</h3>
+        <p class="reference">Ref: LEX ESP Cross Training (historical Legacy ESP methodology)</p>
+        <div class="equation">
+            <span class="eq-label">Formula (as function of L)</span>
+            DLS = 2 × arcsin[ 40 × (Drift − OD) / (4 × (Drift − OD)² + L²) ]  &nbsp;&nbsp; [°/100 ft]
+        </div>
+        <div class="equation">
+            <span class="eq-label">Solved for L</span>
+            L = √[ 40 × (Drift − OD) / sin(DLS/2) − 4 × (Drift − OD)² ]  &nbsp;&nbsp; [feet]
+        </div>
+        <p><b>Basis:</b> Geometric method using drift diameter. Trigonometric formulation from legacy LEX training material.
+        Similar conservatism to Camilleri/SLB but without ovality treatment.</p>
+        <p><b>When to use:</b> Cross-validation against Camilleri/SLB. Common in older engineering practice.</p>
+
+        <h3 class="mt-20">Minimum Curvature (DLS from Survey)</h3>
+        <p class="reference">Ref: API RP 78 &nbsp;|&nbsp; SPE textbook standard</p>
+        <div class="equation">
+            <span class="eq-label">Dogleg angle</span>
+            cos(β) = cos(I₂ − I₁) − sin(I₁) × sin(I₂) × [1 − cos(A₂ − A₁)]
+        </div>
+        <div class="equation">
+            <span class="eq-label">DLS</span>
+            DLS = β × (NormLen / ΔMD) × (180 / π)  &nbsp;&nbsp; where NormLen = 100 ft or 30 m
+        </div>
+        <p><b>Note:</b> β must be converted to degrees before scaling. Values I₁, I₂ (inclination) and A₁, A₂ (azimuth) all in
+        the same angle unit (degrees or radians consistently). This calculator internally handles unit conversion.</p>
+
+        <h3 class="mt-20">Bending Stress — Common Framework</h3>
+        <div class="equation">
+            <span class="eq-label">Universal bending stress</span>
+            σ<sub>b</sub> = (E × OD × DLS<sub>ESP</sub>) / 137,510  &nbsp;&nbsp; [psi]
+        </div>
+        <p>Where:
+        <br>&nbsp;&nbsp;• E = Elastic modulus (30×10⁶ psi for steel, 29.4×10⁶ for Inconel 718)
+        <br>&nbsp;&nbsp;• OD = ESP outer diameter (inches)
+        <br>&nbsp;&nbsp;• DLS<sub>ESP</sub> = residual bending on ESP body (°/100 ft) = DLS<sub>casing</sub> − DLS<sub>zero</sub>
+        <br>&nbsp;&nbsp;• 137,510 = unit conversion constant (embeds π/180 and 100 ft → 1200 in scale)
+        </p>
+
+        <div class="callout gold">
+            <div class="callout-title">Standing Principle — Multi-Method Consensus</div>
+            <div class="callout-body">
+                No single closed-form method captures all real-world effects. Alkhorayef practice applies all 4 in parallel:
+                if 3 agree and 1 diverges by &gt;30%, the divergent result is scrutinized (input error or edge case).
+                The most conservative result governs unless FEA (ASAP) supersedes.
+                For DLS &gt; 6°/100 ft, closed-form is screening only — FEA is mandatory.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ PRINT & EXPORT ============ -->
+<div class="section no-print">
+    <div class="section-header">
+        3. Export &amp; Print
+        <span class="badge">Output</span>
+    </div>
+    <div class="section-body">
+        <p>This calculator is self-contained (no internet required). All calculations run locally in your browser.
+        Print or save-as-PDF for record-keeping. Configuration and results are preserved in printed output.</p>
+        <button class="apc-btn gold" onclick="printPage()">🖨 PRINT / SAVE AS PDF</button>
+        <button class="apc-btn" onclick="location.reload()">↺ RESET ALL INPUTS</button>
+    </div>
+</div>
+
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="apc-footer">
+    <div class="references">
+        <div>
+            <h4>Primary References</h4>
+            <ul>
+                <li>TB-GOS-ESP-DEV-001 Rev. 0 (Alkhorayef bulletin)</li>
+                <li>SPE-74560 (Camilleri 2002)</li>
+                <li>SPE-181225 (Camilleri 2016)</li>
+                <li>SPE-179121 (Skoczylas)</li>
+                <li>SPE-204500 (Torque &amp; Drag ESP RIH)</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Standards</h4>
+            <ul>
+                <li>API 5CT — Casing &amp; Tubing</li>
+                <li>API RP 78 — Wellbore Trajectory</li>
+                <li>API RP 11S — ESP Recommended Practice</li>
+                <li>NACE MR0175 (housing materials)</li>
+                <li>ISO 15551 — ESP Systems</li>
+            </ul>
+        </div>
+        <div>
+            <h4>Alkhorayef Documents</h4>
+            <ul>
+                <li>REDA Deviation/Dogleg (Ibrahim 2014)</li>
+                <li>OPS-GLB-En-101276 Rev.B (Bending)</li>
+                <li>RIH/POOH Speed Optimization (Alresheedi)</li>
+                <li>ESP Installation Stress Analysis</li>
+                <li>Global Operations Support KPI Framework</li>
+            </ul>
+        </div>
+    </div>
+    <div class="copyright">
+        © 2026 Alkhorayef Petroleum Company — Global Operations Support &nbsp;|&nbsp;
+        CONFIDENTIAL — Internal Engineering Use &nbsp;|&nbsp;
+        Rev. 1.0 (Sep 2026)
+    </div>
+</footer>
+
+<script>
+
+const CASING_DATA = [{label:"4-1/2\" 9.50 lb/ft (H-40, J-55)",od:4.5,wt:9.5,id:4.09,drift:3.965},
+{label:"4-1/2\" 11.60 lb/ft (J/K/N-55, L/N-80)",od:4.5,wt:11.6,id:4.0,drift:3.875},
+{label:"4-1/2\" 13.50 lb/ft (J/K/L/N-80)",od:4.5,wt:13.5,id:3.92,drift:3.795},
+{label:"5\" 15.00 lb/ft (J/K/L/N-80)",od:5.0,wt:15.0,id:4.408,drift:4.283},
+{label:"5\" 18.00 lb/ft (J/K/L/N-80)",od:5.0,wt:18.0,id:4.276,drift:4.151},
+{label:"5-1/2\" 14.00 lb/ft (H-40, J-55)",od:5.5,wt:14.0,id:5.012,drift:4.887},
+{label:"5-1/2\" 15.50 lb/ft (J/K-55)",od:5.5,wt:15.5,id:4.95,drift:4.825},
+{label:"5-1/2\" 17.00 lb/ft (J/K/L/N)",od:5.5,wt:17.0,id:4.892,drift:4.767},
+{label:"5-1/2\" 20.00 lb/ft (L/N-80, P-110)",od:5.5,wt:20.0,id:4.778,drift:4.653},
+{label:"5-1/2\" 23.00 lb/ft (P-110, Q-125)",od:5.5,wt:23.0,id:4.67,drift:4.545},
+{label:"6-5/8\" 24.00 lb/ft (H-40, J/K-55)",od:6.625,wt:24.0,id:6.049,drift:5.924},
+{label:"6-5/8\" 28.00 lb/ft (J/K/L/N)",od:6.625,wt:28.0,id:5.921,drift:5.796},
+{label:"6-5/8\" 32.00 lb/ft (L/N-80)",od:6.625,wt:32.0,id:5.791,drift:5.666},
+{label:"7\" 17.00 lb/ft (H-40, J-55)",od:7.0,wt:17.0,id:6.538,drift:6.413},
+{label:"7\" 20.00 lb/ft (H-40, J/K-55)",od:7.0,wt:20.0,id:6.456,drift:6.331},
+{label:"7\" 23.00 lb/ft (J/K-55, L/N-80) — PDO RUNIB standard",od:7.0,wt:23.0,id:6.366,drift:6.241},
+{label:"7\" 26.00 lb/ft (L/N-80, P-110)",od:7.0,wt:26.0,id:6.276,drift:6.151},
+{label:"7\" 29.00 lb/ft (L/N-80, P-110)",od:7.0,wt:29.0,id:6.184,drift:6.059},
+{label:"7\" 32.00 lb/ft (P-110, Q-125)",od:7.0,wt:32.0,id:6.094,drift:5.969},
+{label:"7\" 35.00 lb/ft (P-110, Q-125)",od:7.0,wt:35.0,id:6.004,drift:5.879},
+{label:"7\" 38.00 lb/ft (Q-125)",od:7.0,wt:38.0,id:5.92,drift:5.795},
+{label:"7-5/8\" 26.40 lb/ft (J/K-55)",od:7.625,wt:26.4,id:6.969,drift:6.844},
+{label:"7-5/8\" 29.70 lb/ft (L/N-80)",od:7.625,wt:29.7,id:6.875,drift:6.75},
+{label:"7-5/8\" 33.70 lb/ft (L/N-80, P-110)",od:7.625,wt:33.7,id:6.765,drift:6.64},
+{label:"7-5/8\" 39.00 lb/ft (P-110, Q-125)",od:7.625,wt:39.0,id:6.625,drift:6.5},
+{label:"8-5/8\" 24.00 lb/ft (H-40)",od:8.625,wt:24.0,id:8.097,drift:7.972},
+{label:"8-5/8\" 28.00 lb/ft (H-40, J/K-55)",od:8.625,wt:28.0,id:8.017,drift:7.892},
+{label:"8-5/8\" 32.00 lb/ft (J/K-55)",od:8.625,wt:32.0,id:7.921,drift:7.796},
+{label:"8-5/8\" 36.00 lb/ft (J/K-55, L/N-80)",od:8.625,wt:36.0,id:7.825,drift:7.7},
+{label:"8-5/8\" 40.00 lb/ft (L/N-80)",od:8.625,wt:40.0,id:7.725,drift:7.6},
+{label:"8-5/8\" 44.00 lb/ft (L/N-80, P-110)",od:8.625,wt:44.0,id:7.625,drift:7.5},
+{label:"8-5/8\" 49.00 lb/ft (P-110)",od:8.625,wt:49.0,id:7.511,drift:7.386},
+{label:"9-5/8\" 32.30 lb/ft (H-40, J/K-55)",od:9.625,wt:32.3,id:9.001,drift:8.845},
+{label:"9-5/8\" 36.00 lb/ft (J/K-55)",od:9.625,wt:36.0,id:8.921,drift:8.765},
+{label:"9-5/8\" 40.00 lb/ft (J/K-55, L/N-80)",od:9.625,wt:40.0,id:8.835,drift:8.679},
+{label:"9-5/8\" 43.50 lb/ft (L/N-80, P-110)",od:9.625,wt:43.5,id:8.755,drift:8.599},
+{label:"9-5/8\" 47.00 lb/ft (L/N-80, P-110)",od:9.625,wt:47.0,id:8.681,drift:8.525},
+{label:"9-5/8\" 53.50 lb/ft (P-110, Q-125)",od:9.625,wt:53.5,id:8.535,drift:8.379},
+{label:"10-3/4\" 32.75 lb/ft (H-40)",od:10.75,wt:32.75,id:10.192,drift:10.036},
+{label:"10-3/4\" 40.50 lb/ft (J/K-55)",od:10.75,wt:40.5,id:10.05,drift:9.894},
+{label:"10-3/4\" 45.50 lb/ft (J/K-55, L/N-80)",od:10.75,wt:45.5,id:9.95,drift:9.794},
+{label:"10-3/4\" 51.00 lb/ft (L/N-80)",od:10.75,wt:51.0,id:9.85,drift:9.694},
+{label:"10-3/4\" 55.50 lb/ft (L/N-80, P-110)",od:10.75,wt:55.5,id:9.76,drift:9.604},
+{label:"13-3/8\" 48.00 lb/ft (H-40)",od:13.375,wt:48.0,id:12.715,drift:12.559},
+{label:"13-3/8\" 54.50 lb/ft (J/K-55)",od:13.375,wt:54.5,id:12.615,drift:12.459},
+{label:"13-3/8\" 61.00 lb/ft (J/K-55, L/N-80)",od:13.375,wt:61.0,id:12.515,drift:12.359},
+{label:"13-3/8\" 68.00 lb/ft (L/N-80, P-110)",od:13.375,wt:68.0,id:12.415,drift:12.259},
+{label:"13-3/8\" 72.00 lb/ft (L/N-80, P-110)",od:13.375,wt:72.0,id:12.347,drift:12.191}];
+const TUBING_DATA = [{label:"2-3/8\" 4.60 lb/ft (J/L/N)",od:2.375,wt:4.6,id:1.995,drift:1.901},
+{label:"2-3/8\" 4.70 lb/ft (J/L/N/P)",od:2.375,wt:4.7,id:1.995,drift:1.901},
+{label:"2-7/8\" 6.40 lb/ft (J/L/N)",od:2.875,wt:6.4,id:2.441,drift:2.347},
+{label:"2-7/8\" 6.50 lb/ft (J/L/N/P)",od:2.875,wt:6.5,id:2.441,drift:2.347},
+{label:"2-7/8\" 7.90 lb/ft (L/N/P)",od:2.875,wt:7.9,id:2.323,drift:2.229},
+{label:"2-7/8\" 8.60 lb/ft (P/Q)",od:2.875,wt:8.6,id:2.259,drift:2.165},
+{label:"3-1/2\" 7.70 lb/ft (J/L)",od:3.5,wt:7.7,id:3.068,drift:2.943},
+{label:"3-1/2\" 9.20 lb/ft (J/L/N)",od:3.5,wt:9.2,id:2.992,drift:2.867},
+{label:"3-1/2\" 9.30 lb/ft (J/L/N/P) — RUNIB standard",od:3.5,wt:9.3,id:2.992,drift:2.867},
+{label:"3-1/2\" 10.20 lb/ft (L/N/P)",od:3.5,wt:10.2,id:2.922,drift:2.797},
+{label:"3-1/2\" 12.70 lb/ft (P/Q)",od:3.5,wt:12.7,id:2.75,drift:2.625},
+{label:"4\" 9.50 lb/ft (J/L)",od:4.0,wt:9.5,id:3.548,drift:3.423},
+{label:"4\" 11.00 lb/ft (L/N/P)",od:4.0,wt:11.0,id:3.476,drift:3.351},
+{label:"4-1/2\" 12.60 lb/ft (J/L)",od:4.5,wt:12.6,id:3.958,drift:3.833},
+{label:"4-1/2\" 12.75 lb/ft (J/L/N/P)",od:4.5,wt:12.75,id:3.958,drift:3.833},
+{label:"4-1/2\" 15.10 lb/ft (L/N/P)",od:4.5,wt:15.1,id:3.826,drift:3.701},
+{label:"4-1/2\" 17.00 lb/ft (P/Q)",od:4.5,wt:17.0,id:3.74,drift:3.615}];
+const ESP_SERIES = [{label:"338 series",od:3.38},
+{label:"375 series",od:3.75},
+{label:"400 series",od:4.0},
+{label:"450 series",od:4.5},
+{label:"513 series",od:5.13},
+{label:"538 series",od:5.38},
+{label:"562 series",od:5.62},
+{label:"675 series",od:6.75},
+{label:"862 series",od:8.62},
+{label:"Custom (enter manually)",od:null}];
+const MATERIALS = [{label:"Carbon Steel (K-55 equiv.)",yield_ksi:55,e_mpsi:30.0},
+{label:"4140 Modern Alloy",yield_ksi:75,e_mpsi:30.0},
+{label:"9Cr-1Mo (P-9)",yield_ksi:65,e_mpsi:30.0},
+{label:"13Cr (L-80 13Cr)",yield_ksi:80,e_mpsi:30.0},
+{label:"Super 13Cr (S-13Cr)",yield_ksi:85,e_mpsi:30.0},
+{label:"Inconel 718",yield_ksi:145,e_mpsi:29.4},
+{label:"Custom (enter yield & E)",yield_ksi:null,e_mpsi:null}];
+
+/* ============================================================
+   APC ESP BENDING CALCULATOR — JAVASCRIPT ENGINE
+   All 4 methods, DLS from survey, stress analysis, SVG charts
+   References:
+   - APC L_a formula (Dr. Lee, Jan 2023) — TB-GOS-ESP-DEV-001 §7.3
+   - Camilleri/SLB Eqs 1, 2, 5.2 — SPE-74560, SPE-181225
+   - PCM Skoczylas formula — SPE-179121
+   - LEX arcsin formula — Legacy ESP Cross training
+   ============================================================ */
+
+/* ---------- STATE ---------- */
+const STATE = {
+    casing: null,
+    tubing: null,
+    esp_od: 5.38,
+    esp_length: 31.15,   // ft
+    material: MATERIALS[1],  // 4140 default
+    esp_yield_ksi: 75,
+    esp_E_Mpsi: 30.0,
+    ovality_pct: 3.0,    // default per SPE-74560
+};
+
+/* ============================================================
+   METHOD 1 — APC L_a (Dr. Lee, Jan 2023)
+   L_a = 0.1667 * sqrt((ID - OD) * (137580/DLS - ID + OD))
+   ID and OD in inches, DLS in °/100 ft, output in feet
+   ============================================================ */
+function calcAPC(id_in, od_in, dls_per100ft) {
+    if (id_in <= od_in) return null;
+    if (dls_per100ft <= 0) return null;
+    const term = (137580.0 / dls_per100ft) - id_in + od_in;
+    if (term <= 0) return null;
+    const inner = (id_in - od_in) * term;
+    if (inner < 0) return null;
+    return 0.1667 * Math.sqrt(inner);
+}
+
+/* ============================================================
+   METHOD 2 — Camilleri / SLB Eq. 1 (zero-bend length)
+   Uses drift × 0.97 (3% ovality per SPE-74560)
+   Radius of curvature R = 5729.578 / DLS (ft), for DLS in °/100 ft
+   L_zero = 2 * sqrt((R + ID_eff/2)^2 - (R - ID_eff/2 + OD)^2)  [ft]
+   where ID_eff = drift_in / 12 (converted to feet along with radius)
+   To keep units consistent, do everything in inches → then convert:
+     R_in = R_ft * 12
+   Simpler: work in inches for OD, ID, and R (in inches).
+   R (inches) = 68754.94 / DLS  (for DLS in °/100 ft)
+   Because 5729.578 ft/DLS_deg_per_ft; but our DLS is per 100 ft, so:
+     angle/ft = DLS(°/100ft) * (π/180) / 100 rad/ft
+     R (ft) = 1 / (angle/ft) = 100 / (DLS * π/180) = 5729.578 / DLS
+     R (in) = 68754.94 / DLS
+   Then in inches:
+     L_zero_in = 2 * sqrt((R + ID_eff/2)^2 - (R - ID_eff/2 + OD)^2)
+     L_zero_ft = L_zero_in / 12
+   ============================================================ */
+function calcSLB(drift_in, od_in, dls_per100ft, ovality_pct) {
+    if (drift_in <= od_in) return null;
+    if (dls_per100ft <= 0) return null;
+    // Effective ID accounting for ovality
+    const id_eff = drift_in * (1 - ovality_pct / 100.0);
+    if (id_eff <= od_in) return null;
+    const R_in = 68754.94 / dls_per100ft;   // radius in inches
+    const term1 = Math.pow(R_in + id_eff / 2.0, 2);
+    const term2 = Math.pow(R_in - id_eff / 2.0 + od_in, 2);
+    const inner = term1 - term2;
+    if (inner < 0) return null;
+    const L_zero_in = 2.0 * Math.sqrt(inner);
+    return L_zero_in / 12.0;   // to feet
+}
+
+/* ============================================================
+   METHOD 3 — PCM Skoczylas
+   DLS = (8 * 1500 * ΔD) / (π * L^2)
+   Solve for L:  L = sqrt(8 * 1500 * ΔD / (π * DLS))
+   ΔD = ID - OD, in inches; DLS in °/100 ft; L in inches → convert to ft
+   The 1500 constant embeds unit conversions per Skoczylas SPE-179121.
+   Actually per Skoczylas paper, the reference length gives:
+     L(ft) = sqrt(1500 * (ID - OD) / DLS)
+   where 1500 embeds all constants for DLS in °/100 ft and dims in inches.
+   ============================================================ */
+function calcPCM(id_in, od_in, dls_per100ft) {
+    if (id_in <= od_in) return null;
+    if (dls_per100ft <= 0) return null;
+    return Math.sqrt(1500.0 * (id_in - od_in) / dls_per100ft);
+}
+
+/* ============================================================
+   METHOD 4 — LEX arcsin
+   DLS = 2 * arcsin( 40 * (drift - OD) / (4 * (drift - OD)^2 + L^2) )   [degrees per 100 ft]
+   Solve for L:
+     sin(DLS/2) = 40*(drift-OD) / (4*(drift-OD)^2 + L^2)
+     4*(drift-OD)^2 + L^2 = 40*(drift-OD) / sin(DLS/2)
+     L = sqrt( 40*(drift-OD)/sin(DLS/2) - 4*(drift-OD)^2 )
+   L in feet (per LEX Cross training).
+   ============================================================ */
+function calcLEX(drift_in, od_in, dls_per100ft) {
+    if (drift_in <= od_in) return null;
+    if (dls_per100ft <= 0) return null;
+    const delta = drift_in - od_in;
+    const halfDLS_rad = (dls_per100ft / 2.0) * Math.PI / 180.0;
+    const sinHalf = Math.sin(halfDLS_rad);
+    if (sinHalf <= 0) return null;
+    const term = 40.0 * delta / sinHalf - 4.0 * delta * delta;
+    if (term < 0) return null;
+    return Math.sqrt(term);
+}
+
+/* ============================================================
+   MINIMUM CURVATURE — Compute DLS between two survey stations
+   Returns DLS in °/100 ft
+   ============================================================ */
+function calcDLS_minCurvature(md1, inc1_deg, az1_deg, md2, inc2_deg, az2_deg, unit) {
+    // unit: 'ft' or 'm' — determines normalization
+    const dMD = md2 - md1;
+    if (dMD <= 0) return null;
+
+    const i1 = inc1_deg * Math.PI / 180.0;
+    const i2 = inc2_deg * Math.PI / 180.0;
+    const a1 = az1_deg * Math.PI / 180.0;
+    const a2 = az2_deg * Math.PI / 180.0;
+
+    // Dogleg angle β
+    let cosBeta = Math.cos(i2 - i1) - Math.sin(i1) * Math.sin(i2) * (1.0 - Math.cos(a2 - a1));
+    // Numerical clamp
+    if (cosBeta > 1.0) cosBeta = 1.0;
+    if (cosBeta < -1.0) cosBeta = -1.0;
+    const beta_rad = Math.acos(cosBeta);
+    const beta_deg = beta_rad * 180.0 / Math.PI;
+
+    // Normalize per requested length units
+    const normLen = (unit === 'm') ? 30.0 : 100.0;
+    const DLS = beta_deg * (normLen / dMD);
+
+    return {
+        beta_deg: beta_deg,
+        DLS_per100ft: unit === 'm' ? DLS * (100.0 / 30.0) * (dMD / dMD) : DLS,
+        DLS_per30m: unit === 'ft' ? DLS * (30.0 / 100.0) * (dMD / dMD) : DLS,
+        _norm: normLen
+    };
+}
+
+/* Simpler DLS function: returns both units */
+function DLS_both(md1, i1, a1, md2, i2, a2, unit) {
+    const dMD = md2 - md1;
+    if (dMD <= 0) return null;
+    const i1r = i1 * Math.PI / 180.0;
+    const i2r = i2 * Math.PI / 180.0;
+    let cosB = Math.cos(i2r - i1r) - Math.sin(i1r) * Math.sin(i2r) * (1.0 - Math.cos((a2 - a1) * Math.PI / 180.0));
+    if (cosB > 1) cosB = 1;
+    if (cosB < -1) cosB = -1;
+    const beta = Math.acos(cosB) * 180.0 / Math.PI;
+    // DLS per 100 ft
+    let DLS_100ft, DLS_30m;
+    if (unit === 'ft') {
+        DLS_100ft = beta * (100.0 / dMD);
+        DLS_30m   = DLS_100ft * (30.0 / 30.48);   // convert 30 m equivalent in ft: 98.425 ft
+    } else {
+        DLS_30m   = beta * (30.0 / dMD);
+        DLS_100ft = DLS_30m * (30.48 / 30.0);     // 100 ft = 30.48 m
+    }
+    return { beta: beta, DLS_100ft: DLS_100ft, DLS_30m: DLS_30m };
+}
+
+/* ============================================================
+   STRESS ANALYSIS — Bending stress at operating DLS
+   σ_b (psi) = (E * OD * DLS_ESP) / 137,510
+   where E = 30e6 psi (steel), OD in inches, DLS in °/100 ft
+   Constant 137,510 embeds unit conversions.
+   ============================================================ */
+
+/* Zero-bend DLS: DLS below which ESP feels no bending (radial clearance takes it) */
+function calcDLS_zero(drift_in, od_in, esp_length_ft, ovality_pct, method) {
+    // Compute using selected method: what DLS would give L = esp_length?
+    // Inverse of each formula.
+    const dc_in = drift_in * (1 - ovality_pct / 100.0);  // effective clearance dim
+    const id_in = drift_in;  // for APC use ID
+    switch (method) {
+        case 'apc': {
+            // L = 0.1667 * sqrt((ID-OD)*(137580/DLS - ID + OD))
+            // L^2 / 0.02779 = (ID-OD)*(137580/DLS - ID + OD)
+            // Let A = L^2 / 0.02779; ΔD = ID-OD
+            // A/ΔD = 137580/DLS - ΔD
+            // 137580/DLS = A/ΔD + ΔD
+            // DLS = 137580 / (A/ΔD + ΔD)
+            const L2 = esp_length_ft * esp_length_ft;
+            const A  = L2 / (0.1667 * 0.1667);
+            const dD = id_in - od_in;
+            if (dD <= 0) return null;
+            return 137580.0 / (A / dD + dD);
+        }
+        case 'slb': {
+            // Numeric solve: try range of DLS values
+            let lo = 0.001, hi = 20.0;
+            for (let iter = 0; iter < 60; iter++) {
+                const mid = (lo + hi) / 2;
+                const L = calcSLB(drift_in, od_in, mid, ovality_pct);
+                if (L === null) { hi = mid; continue; }
+                if (L > esp_length_ft) lo = mid; else hi = mid;
+            }
+            return (lo + hi) / 2;
+        }
+        case 'pcm': {
+            // L = sqrt(1500 * (ID-OD) / DLS)  →  DLS = 1500 * (ID-OD) / L^2
+            const dD = id_in - od_in;
+            if (dD <= 0) return null;
+            return 1500.0 * dD / (esp_length_ft * esp_length_ft);
+        }
+        case 'lex': {
+            let lo = 0.001, hi = 20.0;
+            for (let iter = 0; iter < 60; iter++) {
+                const mid = (lo + hi) / 2;
+                const L = calcLEX(drift_in, od_in, mid);
+                if (L === null) { hi = mid; continue; }
+                if (L > esp_length_ft) lo = mid; else hi = mid;
+            }
+            return (lo + hi) / 2;
+        }
+    }
+    return null;
+}
+
+function calcBendingStress(od_in, dls_esp_per100ft, E_psi) {
+    if (dls_esp_per100ft <= 0) return 0;
+    return (E_psi * od_in * dls_esp_per100ft) / 137510.0;
+}
+
+function stressBand(sigma_psi) {
+    const ksi = sigma_psi / 1000.0;
+    if (ksi < 20.0) return { band: 'Recommended', color: 'sage', hex: '#A3BC93' };
+    if (ksi < 35.0) return { band: 'Caution',     color: 'orange', hex: '#E2A268' };
+    return { band: 'HiStress', color: 'red', hex: '#D36962' };
+}
+
+/* ============================================================
+   POPULATE DROPDOWNS
+   ============================================================ */
+function populateDropdowns() {
+    // Casing
+    const casingSel = document.getElementById('casing-select');
+    casingSel.innerHTML = '<option value="">-- Select API casing --</option>';
+    CASING_DATA.forEach((c, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = c.label + '  (ID: ' + c.id.toFixed(3) + '", Drift: ' + c.drift.toFixed(3) + '")';
+        casingSel.appendChild(opt);
+    });
+    // Default: 7" 23#/ft PDO RUNIB
+    casingSel.value = CASING_DATA.findIndex(c => c.label.includes('PDO RUNIB'));
+
+    // Tubing
+    const tubSel = document.getElementById('tubing-select');
+    tubSel.innerHTML = '<option value="">-- Select API tubing --</option>';
+    TUBING_DATA.forEach((t, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = t.label + '  (ID: ' + t.id.toFixed(3) + '", Drift: ' + t.drift.toFixed(3) + '")';
+        tubSel.appendChild(opt);
+    });
+    tubSel.value = TUBING_DATA.findIndex(t => t.label.includes('RUNIB'));
+
+    // ESP series
+    const espSel = document.getElementById('esp-series-select');
+    espSel.innerHTML = '';
+    ESP_SERIES.forEach((e, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = e.od === null ? e.label : e.label + '  (OD: ' + e.od.toFixed(2) + '")';
+        espSel.appendChild(opt);
+    });
+    espSel.value = ESP_SERIES.findIndex(e => e.label.includes('538'));
+
+    // Material
+    const matSel = document.getElementById('material-select');
+    matSel.innerHTML = '';
+    MATERIALS.forEach((m, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = m.label + (m.yield_ksi ? '  (Yield: ' + m.yield_ksi + ' ksi)' : '');
+        matSel.appendChild(opt);
+    });
+    matSel.value = 1; // 4140 default
+}
+
+/* ============================================================
+   READ / UPDATE STATE
+   ============================================================ */
+function updateConfig() {
+    const casingIdx  = parseInt(document.getElementById('casing-select').value);
+    const tubingIdx  = parseInt(document.getElementById('tubing-select').value);
+    const espIdx     = parseInt(document.getElementById('esp-series-select').value);
+    const matIdx     = parseInt(document.getElementById('material-select').value);
+
+    STATE.casing = !isNaN(casingIdx) && casingIdx >= 0 ? CASING_DATA[casingIdx] : null;
+    STATE.tubing = !isNaN(tubingIdx) && tubingIdx >= 0 ? TUBING_DATA[tubingIdx] : null;
+
+    // ESP OD from series or custom
+    if (!isNaN(espIdx) && espIdx >= 0) {
+        const esp = ESP_SERIES[espIdx];
+        if (esp.od !== null) {
+            STATE.esp_od = esp.od;
+            document.getElementById('esp-od').value = esp.od;
+        }
+    }
+    const customOD = parseFloat(document.getElementById('esp-od').value);
+    if (!isNaN(customOD) && customOD > 0) STATE.esp_od = customOD;
+
+    STATE.esp_length = parseFloat(document.getElementById('esp-length').value) || 31.15;
+    STATE.ovality_pct = parseFloat(document.getElementById('ovality').value) || 3.0;
+
+    // Material
+    if (!isNaN(matIdx) && matIdx >= 0) {
+        const m = MATERIALS[matIdx];
+        if (m.yield_ksi !== null) {
+            STATE.material = m;
+            STATE.esp_yield_ksi = m.yield_ksi;
+            STATE.esp_E_Mpsi = m.e_mpsi;
+            document.getElementById('yield-ksi').value = m.yield_ksi;
+            document.getElementById('modulus-Mpsi').value = m.e_mpsi;
+        }
+    }
+    const customYield = parseFloat(document.getElementById('yield-ksi').value);
+    const customE = parseFloat(document.getElementById('modulus-Mpsi').value);
+    if (!isNaN(customYield)) STATE.esp_yield_ksi = customYield;
+    if (!isNaN(customE)) STATE.esp_E_Mpsi = customE;
+
+    // Update summary readout
+    updateSummary();
+}
+
+function updateSummary() {
+    const summary = document.getElementById('config-summary');
+    if (!STATE.casing || !STATE.tubing) {
+        summary.innerHTML = '<span style="color:#948984;font-style:italic">Select casing and tubing to compute</span>';
+        return;
+    }
+    summary.innerHTML =
+        '<span class="config-item"><span class="label">Casing ID:</span> ' + STATE.casing.id.toFixed(3) + '"</span>' +
+        '<span class="config-item"><span class="label">Drift:</span> ' + STATE.casing.drift.toFixed(3) + '"</span>' +
+        '<span class="config-item"><span class="label">Tubing OD:</span> ' + STATE.tubing.od.toFixed(3) + '"</span>' +
+        '<span class="config-item"><span class="label">ESP OD:</span> ' + STATE.esp_od.toFixed(2) + '"</span>' +
+        '<span class="config-item"><span class="label">Radial clearance:</span> ' + ((STATE.casing.drift - STATE.esp_od) / 2).toFixed(3) + '"</span>';
+}
+
+/* ============================================================
+   MAX ALLOWABLE LENGTH CALCULATOR
+   ============================================================ */
+function calcMaxLength() {
+    updateConfig();
+    if (!STATE.casing) { alert('Please select a casing size first.'); return; }
+    const dls = parseFloat(document.getElementById('max-len-dls').value);
+    if (isNaN(dls) || dls <= 0) { alert('Please enter a valid DLS value.'); return; }
+
+    const results = {
+        apc:  calcAPC(STATE.casing.id,    STATE.esp_od, dls),
+        slb:  calcSLB(STATE.casing.drift, STATE.esp_od, dls, STATE.ovality_pct),
+        pcm:  calcPCM(STATE.casing.id,    STATE.esp_od, dls),
+        lex:  calcLEX(STATE.casing.drift, STATE.esp_od, dls),
+    };
+
+    // Update result cards
+    const html = `
+        <div class="result-card gold-fill">
+            <div class="label">APC (Dr. Lee, 2023)</div>
+            <div class="value">${results.apc !== null ? results.apc.toFixed(2) : 'N/A'}<span class="unit">ft</span></div>
+            <div class="method">Nominal ID basis</div>
+        </div>
+        <div class="result-card">
+            <div class="label">Camilleri / SLB</div>
+            <div class="value">${results.slb !== null ? results.slb.toFixed(2) : 'N/A'}<span class="unit">ft</span></div>
+            <div class="method">Drift × ${(100 - STATE.ovality_pct).toFixed(0)}% (ovality)</div>
+        </div>
+        <div class="result-card">
+            <div class="label">PCM Skoczylas</div>
+            <div class="value">${results.pcm !== null ? results.pcm.toFixed(2) : 'N/A'}<span class="unit">ft</span></div>
+            <div class="method">Nominal ID basis</div>
+        </div>
+        <div class="result-card">
+            <div class="label">LEX (arcsin)</div>
+            <div class="value">${results.lex !== null ? results.lex.toFixed(2) : 'N/A'}<span class="unit">ft</span></div>
+            <div class="method">Drift basis</div>
+        </div>
+    `;
+    document.getElementById('max-len-results').innerHTML = html;
+
+    // Comparison to actual ESP length
+    const actualL = STATE.esp_length;
+    const compare = document.getElementById('max-len-compare');
+    const methods = [
+        { name: 'APC', val: results.apc, ref: 'TB §7.3' },
+        { name: 'Camilleri/SLB', val: results.slb, ref: 'SPE-74560, SPE-181225' },
+        { name: 'PCM Skoczylas', val: results.pcm, ref: 'SPE-179121' },
+        { name: 'LEX', val: results.lex, ref: 'LEX cross training' },
+    ];
+    let rows = '';
+    methods.forEach(m => {
+        const passed = m.val !== null && m.val >= actualL;
+        const margin = m.val !== null ? ((m.val - actualL) / actualL * 100) : null;
+        const marginTxt = margin !== null ? (margin >= 0 ? '+' : '') + margin.toFixed(1) + '%' : 'N/A';
+        const bg = passed ? '#D8E4CE' : '#F5D0CD';
+        const verdict = m.val === null ? 'N/A' : (passed ? '✓ PASSES' : '✗ FAILS');
+        rows += `<tr style="background:${bg}">
+            <td class="bold">${m.name}</td>
+            <td class="numeric">${m.val !== null ? m.val.toFixed(2) : 'N/A'}</td>
+            <td class="numeric">${actualL.toFixed(2)}</td>
+            <td class="numeric">${marginTxt}</td>
+            <td class="center bold">${verdict}</td>
+            <td>${m.ref}</td>
+        </tr>`;
+    });
+    compare.innerHTML = `
+        <h3>Comparison to Actual ESP String (${actualL.toFixed(2)} ft)</h3>
+        <table class="data-table">
+            <thead><tr>
+                <th>Method</th><th>Max Allowable L (ft)</th><th>Actual L (ft)</th>
+                <th>Margin</th><th>Verdict</th><th>Reference</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+
+    // Render chart
+    renderChart();
+}
+
+/* ============================================================
+   STRESS ANALYSIS CALCULATOR
+   ============================================================ */
+function calcStress() {
+    updateConfig();
+    if (!STATE.casing) { alert('Please select a casing size first.'); return; }
+    const dls = parseFloat(document.getElementById('stress-dls').value);
+    if (isNaN(dls) || dls <= 0) { alert('Please enter a valid DLS value.'); return; }
+
+    const E_psi = STATE.esp_E_Mpsi * 1e6;
+
+    // For each method, compute DLS_zero, DLS_ESP residual, stress
+    const methods = [
+        { name: 'APC',            code: 'apc', ref: 'TB §7.3' },
+        { name: 'Camilleri/SLB',  code: 'slb', ref: 'SPE-74560, SPE-181225' },
+        { name: 'PCM Skoczylas',  code: 'pcm', ref: 'SPE-179121' },
+        { name: 'LEX',            code: 'lex', ref: 'LEX cross training' },
+    ];
+
+    let rows = '';
+    let worstBand = 'sage';
+    let worstStress = 0;
+    let worstMethod = null;
+
+    methods.forEach(m => {
+        const dls_zero = calcDLS_zero(STATE.casing.drift, STATE.esp_od, STATE.esp_length, STATE.ovality_pct, m.code);
+        let dls_esp = null, sigma = null, band = null;
+        if (dls_zero !== null) {
+            dls_esp = Math.max(0, dls - dls_zero);
+            sigma = calcBendingStress(STATE.esp_od, dls_esp, E_psi);
+            band = stressBand(sigma);
+            if (sigma > worstStress) {
+                worstStress = sigma;
+                worstBand = band.color;
+                worstMethod = m.name;
+            }
+        }
+        const bandColor = band ? (band.color === 'sage' ? '#D8E4CE' : band.color === 'orange' ? '#F5DDBE' : '#F5D0CD') : '#F4F2F1';
+        rows += `<tr style="background:${bandColor}">
+            <td class="bold">${m.name}</td>
+            <td class="numeric">${dls_zero !== null ? dls_zero.toFixed(3) : 'N/A'}</td>
+            <td class="numeric">${dls_esp !== null ? dls_esp.toFixed(3) : 'N/A'}</td>
+            <td class="numeric">${sigma !== null ? sigma.toFixed(0) : 'N/A'}</td>
+            <td class="numeric">${sigma !== null ? (sigma/1000).toFixed(2) : 'N/A'}</td>
+            <td class="center bold">${band ? band.band : '—'}</td>
+            <td>${m.ref}</td>
+        </tr>`;
+    });
+
+    // Safety factor on yield
+    const SF_worst = worstStress > 0 ? (STATE.esp_yield_ksi * 1000 / worstStress) : Infinity;
+
+    document.getElementById('stress-results').innerHTML = `
+        <h3>Bending Stress Analysis — All Methods</h3>
+        <table class="data-table">
+            <thead><tr>
+                <th>Method</th><th>DLS_zero<br>(°/100ft)</th><th>DLS_ESP residual<br>(°/100ft)</th>
+                <th>σ_b (psi)</th><th>σ_b (ksi)</th><th>Band</th><th>Reference</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+        <div class="results-grid mt-20">
+            <div class="result-card ${worstBand}">
+                <div class="label">Worst Case Stress</div>
+                <div class="value">${(worstStress/1000).toFixed(2)}<span class="unit">ksi</span></div>
+                <div class="method">Method: ${worstMethod || '—'}</div>
+            </div>
+            <div class="result-card gold-fill">
+                <div class="label">Material Yield</div>
+                <div class="value">${STATE.esp_yield_ksi}<span class="unit">ksi</span></div>
+                <div class="method">${STATE.material ? STATE.material.label : ''}</div>
+            </div>
+            <div class="result-card ${SF_worst > 3 ? 'sage' : (SF_worst > 2 ? 'orange' : 'red')}">
+                <div class="label">Safety Factor (worst)</div>
+                <div class="value">${isFinite(SF_worst) ? SF_worst.toFixed(2) : '∞'}<span class="unit">×</span></div>
+                <div class="method">Yield / worst σ_b</div>
+            </div>
+        </div>
+    `;
+
+    // Band interpretation callout
+    const band = stressBand(worstStress);
+    let calloutHTML = '';
+    if (band.color === 'sage') {
+        calloutHTML = `<div class="callout sage">
+            <div class="callout-title">RECOMMENDED BAND — σ_b &lt; 20 ksi</div>
+            <div class="callout-body">Installation acceptable at this DLS. Standard mitigation controls per TB §10 apply.
+            Proceed with normal RIH speed tiers based on DLS band.</div>
+        </div>`;
+    } else if (band.color === 'orange') {
+        calloutHTML = `<div class="callout orange">
+            <div class="callout-title">CAUTION BAND — 20 ≤ σ_b &lt; 35 ksi</div>
+            <div class="callout-body">Elevated stress. Full mitigation package required:
+            reduced RIH speed, all electrical checkpoints, enhanced monitoring, GOS notification.
+            Consider FEA verification (ASAP) before proceeding.</div>
+        </div>`;
+    } else {
+        calloutHTML = `<div class="callout red">
+            <div class="callout-title">HISTRESS BAND — σ_b ≥ 35 ksi</div>
+            <div class="callout-body">DO NOT PROCEED without FEA-based analysis (ASAP mandatory).
+            GOS Engineering approval required. Consider setting-depth relocation
+            or ESP length reduction. High risk of body fracture or hub failure.</div>
+        </div>`;
+    }
+    document.getElementById('stress-callout').innerHTML = calloutHTML;
+}
+
+/* ============================================================
+   SVG CHART — Max Length vs DLS for all methods
+   ============================================================ */
+function renderChart() {
+    updateConfig();
+    if (!STATE.casing) return;
+
+    const svg = document.getElementById('chart-svg');
+    // Clear
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    // Chart dimensions
+    const W = 900, H = 480;
+    const margin = { top: 30, right: 40, bottom: 60, left: 70 };
+    const plotW = W - margin.left - margin.right;
+    const plotH = H - margin.top - margin.bottom;
+
+    // DLS range: 0.5 to 15 °/100 ft
+    const dlsMin = 0.5, dlsMax = 15;
+    const nPts = 100;
+    const dlsRange = [];
+    for (let i = 0; i < nPts; i++) {
+        dlsRange.push(dlsMin + (dlsMax - dlsMin) * i / (nPts - 1));
+    }
+
+    // Compute curves for each method
+    const methods = [
+        { name: 'APC (Dr. Lee)',   color: '#474454', calc: d => calcAPC(STATE.casing.id, STATE.esp_od, d) },
+        { name: 'Camilleri/SLB',   color: '#799CCF', calc: d => calcSLB(STATE.casing.drift, STATE.esp_od, d, STATE.ovality_pct) },
+        { name: 'PCM Skoczylas',   color: '#A3BC93', calc: d => calcPCM(STATE.casing.id, STATE.esp_od, d) },
+        { name: 'LEX (arcsin)',    color: '#E2A268', calc: d => calcLEX(STATE.casing.drift, STATE.esp_od, d) },
+    ];
+
+    // Compute all series
+    const series = methods.map(m => {
+        const points = [];
+        for (const d of dlsRange) {
+            const L = m.calc(d);
+            if (L !== null && L > 0 && L < 500) points.push({ dls: d, L: L });
+        }
+        return { name: m.name, color: m.color, points: points };
+    });
+
+    // Y range from data
+    let yMax = 100;
+    series.forEach(s => s.points.forEach(p => { if (p.L > yMax) yMax = p.L; }));
+    yMax = Math.min(yMax, 200);
+    yMax = Math.ceil(yMax / 20) * 20;
+    const yMin = 0;
+
+    // Scales
+    const xScale = d => margin.left + (d - dlsMin) / (dlsMax - dlsMin) * plotW;
+    const yScale = L => margin.top + plotH - (L - yMin) / (yMax - yMin) * plotH;
+
+    // SVG setup
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    // Background
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', margin.left);
+    bg.setAttribute('y', margin.top);
+    bg.setAttribute('width', plotW);
+    bg.setAttribute('height', plotH);
+    bg.setAttribute('fill', '#F4F2F1');
+    bg.setAttribute('stroke', '#CCC3BB');
+    svg.appendChild(bg);
+
+    // Grid
+    for (let i = 0; i <= 10; i++) {
+        const y = margin.top + i * plotH / 10;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', margin.left);
+        line.setAttribute('x2', margin.left + plotW);
+        line.setAttribute('y1', y);
+        line.setAttribute('y2', y);
+        line.setAttribute('stroke', '#CCC3BB');
+        line.setAttribute('stroke-width', '0.5');
+        line.setAttribute('stroke-dasharray', '2,2');
+        svg.appendChild(line);
+    }
+    for (let i = 0; i <= 10; i++) {
+        const x = margin.left + i * plotW / 10;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('x2', x);
+        line.setAttribute('y1', margin.top);
+        line.setAttribute('y2', margin.top + plotH);
+        line.setAttribute('stroke', '#CCC3BB');
+        line.setAttribute('stroke-width', '0.5');
+        line.setAttribute('stroke-dasharray', '2,2');
+        svg.appendChild(line);
+    }
+
+    // Reference lines for DLS thresholds
+    const refs = [
+        { dls: 1, label: '1°/100ft', color: '#A3BC93' },
+        { dls: 3, label: '3°/100ft', color: '#E2A268' },
+        { dls: 6, label: '6°/100ft (FEA trigger)', color: '#D36962' },
+    ];
+    refs.forEach(r => {
+        const x = xScale(r.dls);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('x2', x);
+        line.setAttribute('y1', margin.top);
+        line.setAttribute('y2', margin.top + plotH);
+        line.setAttribute('stroke', r.color);
+        line.setAttribute('stroke-width', '1.5');
+        line.setAttribute('stroke-dasharray', '4,3');
+        line.setAttribute('opacity', '0.6');
+        svg.appendChild(line);
+        // Label
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', x + 3);
+        txt.setAttribute('y', margin.top + 12);
+        txt.setAttribute('font-family', 'Arial');
+        txt.setAttribute('font-size', '9');
+        txt.setAttribute('fill', r.color);
+        txt.setAttribute('font-weight', 'bold');
+        txt.textContent = r.label;
+        svg.appendChild(txt);
+    });
+
+    // Actual ESP length reference (horizontal line)
+    const yEsp = yScale(STATE.esp_length);
+    if (yEsp >= margin.top && yEsp <= margin.top + plotH) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', margin.left);
+        line.setAttribute('x2', margin.left + plotW);
+        line.setAttribute('y1', yEsp);
+        line.setAttribute('y2', yEsp);
+        line.setAttribute('stroke', '#CFBF9A');
+        line.setAttribute('stroke-width', '2.5');
+        line.setAttribute('stroke-dasharray', '6,3');
+        svg.appendChild(line);
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', margin.left + plotW - 5);
+        txt.setAttribute('y', yEsp - 5);
+        txt.setAttribute('font-family', 'Arial');
+        txt.setAttribute('font-size', '10');
+        txt.setAttribute('fill', '#474454');
+        txt.setAttribute('font-weight', 'bold');
+        txt.setAttribute('text-anchor', 'end');
+        txt.textContent = 'Actual ESP: ' + STATE.esp_length.toFixed(1) + ' ft';
+        svg.appendChild(txt);
+    }
+
+    // Draw series lines
+    series.forEach(s => {
+        if (s.points.length < 2) return;
+        let d = '';
+        s.points.forEach((p, i) => {
+            const x = xScale(p.dls);
+            const y = yScale(Math.min(p.L, yMax));
+            d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+        });
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('stroke', s.color);
+        path.setAttribute('stroke-width', '2.5');
+        path.setAttribute('fill', 'none');
+        svg.appendChild(path);
+    });
+
+    // Axes
+    // X axis
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', margin.left);
+    xAxis.setAttribute('x2', margin.left + plotW);
+    xAxis.setAttribute('y1', margin.top + plotH);
+    xAxis.setAttribute('y2', margin.top + plotH);
+    xAxis.setAttribute('stroke', '#474454');
+    xAxis.setAttribute('stroke-width', '1.5');
+    svg.appendChild(xAxis);
+    // Y axis
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', margin.left);
+    yAxis.setAttribute('x2', margin.left);
+    yAxis.setAttribute('y1', margin.top);
+    yAxis.setAttribute('y2', margin.top + plotH);
+    yAxis.setAttribute('stroke', '#474454');
+    yAxis.setAttribute('stroke-width', '1.5');
+    svg.appendChild(yAxis);
+
+    // X ticks and labels
+    for (let i = 0; i <= 15; i += 1) {
+        const x = xScale(i);
+        if (x < margin.left || x > margin.left + plotW + 1) continue;
+        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tick.setAttribute('x1', x);
+        tick.setAttribute('x2', x);
+        tick.setAttribute('y1', margin.top + plotH);
+        tick.setAttribute('y2', margin.top + plotH + 5);
+        tick.setAttribute('stroke', '#474454');
+        svg.appendChild(tick);
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x', x);
+        lbl.setAttribute('y', margin.top + plotH + 18);
+        lbl.setAttribute('font-family', 'Arial');
+        lbl.setAttribute('font-size', '10');
+        lbl.setAttribute('fill', '#474454');
+        lbl.setAttribute('text-anchor', 'middle');
+        lbl.textContent = i.toString();
+        svg.appendChild(lbl);
+    }
+
+    // Y ticks and labels
+    const yStep = yMax / 10;
+    for (let i = 0; i <= 10; i++) {
+        const yVal = i * yStep;
+        const y = yScale(yVal);
+        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tick.setAttribute('x1', margin.left - 5);
+        tick.setAttribute('x2', margin.left);
+        tick.setAttribute('y1', y);
+        tick.setAttribute('y2', y);
+        tick.setAttribute('stroke', '#474454');
+        svg.appendChild(tick);
+        const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        lbl.setAttribute('x', margin.left - 8);
+        lbl.setAttribute('y', y + 3);
+        lbl.setAttribute('font-family', 'Arial');
+        lbl.setAttribute('font-size', '10');
+        lbl.setAttribute('fill', '#474454');
+        lbl.setAttribute('text-anchor', 'end');
+        lbl.textContent = yVal.toFixed(0);
+        svg.appendChild(lbl);
+    }
+
+    // Axis titles
+    const xTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    xTitle.setAttribute('x', margin.left + plotW / 2);
+    xTitle.setAttribute('y', H - 10);
+    xTitle.setAttribute('font-family', 'Arial');
+    xTitle.setAttribute('font-size', '11');
+    xTitle.setAttribute('font-weight', 'bold');
+    xTitle.setAttribute('fill', '#474454');
+    xTitle.setAttribute('text-anchor', 'middle');
+    xTitle.textContent = 'Dogleg Severity (°/100 ft)';
+    svg.appendChild(xTitle);
+
+    const yTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    yTitle.setAttribute('x', 18);
+    yTitle.setAttribute('y', margin.top + plotH / 2);
+    yTitle.setAttribute('font-family', 'Arial');
+    yTitle.setAttribute('font-size', '11');
+    yTitle.setAttribute('font-weight', 'bold');
+    yTitle.setAttribute('fill', '#474454');
+    yTitle.setAttribute('text-anchor', 'middle');
+    yTitle.setAttribute('transform', `rotate(-90 18 ${margin.top + plotH / 2})`);
+    yTitle.textContent = 'Maximum Allowable Length (ft)';
+    svg.appendChild(yTitle);
+
+    // Chart title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', margin.left + plotW / 2);
+    title.setAttribute('y', 20);
+    title.setAttribute('font-family', 'Arial');
+    title.setAttribute('font-size', '12');
+    title.setAttribute('font-weight', 'bold');
+    title.setAttribute('fill', '#474454');
+    title.setAttribute('text-anchor', 'middle');
+    title.textContent = 'Maximum Allowable ESP Length vs. DLS — All Methods';
+    svg.appendChild(title);
+
+    // Render legend below chart
+    const legend = document.getElementById('chart-legend');
+    let leg = '';
+    series.forEach(s => {
+        leg += `<div class="legend-item"><div class="legend-swatch" style="background:${s.color}"></div>${s.name}</div>`;
+    });
+    leg += `<div class="legend-item"><div class="legend-swatch" style="background:#CFBF9A;border:1px dashed #CFBF9A"></div>Actual ESP length (${STATE.esp_length.toFixed(1)} ft)</div>`;
+    legend.innerHTML = leg;
+}
+
+/* ============================================================
+   DLS FROM SURVEY — Multi-station table
+   ============================================================ */
+function computeDLSTable() {
+    const unit = document.getElementById('dls-unit').value;
+    const rows = document.querySelectorAll('#dls-table tbody tr');
+    let prevMD = null, prevInc = null, prevAz = null;
+
+    rows.forEach((row, idx) => {
+        const md  = parseFloat(row.cells[1].querySelector('input').value);
+        const inc = parseFloat(row.cells[2].querySelector('input').value);
+        const az  = parseFloat(row.cells[3].querySelector('input').value);
+
+        if (isNaN(md) || isNaN(inc) || isNaN(az)) {
+            row.cells[4].textContent = '—';
+            row.cells[5].textContent = '—';
+            row.cells[6].textContent = '—';
+            row.cells[7].textContent = '—';
+            return;
+        }
+
+        if (prevMD === null) {
+            // First station — no DLS
+            row.cells[4].textContent = 'START';
+            row.cells[5].textContent = '—';
+            row.cells[6].textContent = '—';
+            row.cells[7].textContent = '—';
+        } else {
+            const result = DLS_both(prevMD, prevInc, prevAz, md, inc, az, unit);
+            if (result === null) {
+                row.cells[4].textContent = 'N/A';
+                row.cells[5].textContent = '—';
+                row.cells[6].textContent = '—';
+                row.cells[7].textContent = '—';
+            } else {
+                row.cells[4].textContent = result.beta.toFixed(4);
+                row.cells[5].textContent = result.DLS_100ft.toFixed(3);
+                row.cells[6].textContent = result.DLS_30m.toFixed(3);
+                // Band
+                const dls = result.DLS_100ft;
+                let band = 'OK', bg = '#D8E4CE';
+                if (dls > 6) { band = 'HiStress'; bg = '#F5D0CD'; }
+                else if (dls > 3) { band = 'Caution'; bg = '#F5DDBE'; }
+                else if (dls > 1) { band = 'Moderate'; bg = '#EBE4D2'; }
+                row.cells[7].textContent = band;
+                row.cells[7].style.background = bg;
+                row.cells[7].style.fontWeight = 'bold';
+            }
+        }
+        prevMD = md; prevInc = inc; prevAz = az;
+    });
+}
+
+function addDLSRow() {
+    const tbody = document.querySelector('#dls-table tbody');
+    const idx = tbody.rows.length + 1;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td class="center bold">${idx}</td>
+        <td><input type="number" step="0.1" placeholder="MD"></td>
+        <td><input type="number" step="0.01" placeholder="Inc"></td>
+        <td><input type="number" step="0.01" placeholder="Az"></td>
+        <td class="center">—</td>
+        <td class="center">—</td>
+        <td class="center">—</td>
+        <td class="center">—</td>
+    `;
+    tbody.appendChild(tr);
+    tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', computeDLSTable));
+}
+
+function loadRUNIBExample() {
+    // Load 5 stations from RUNIB-112 as demo
+    const example = [
+        [478.3, 2.01, 188.39],
+        [497.5, 4.69, 175.56],
+        [516.8, 9.00, 171.68],
+        [536.1, 12.77, 168.72],
+        [555.1, 16.75, 171.16],
+        [574.2, 19.48, 178.57],
+        [612.0, 24.42, 177.18],
+        [632.6, 29.28, 172.77],
+        [682.0, 40.77, 178.18],
+    ];
+    const tbody = document.querySelector('#dls-table tbody');
+    tbody.innerHTML = '';
+    document.getElementById('dls-unit').value = 'm';
+    example.forEach((s, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="center bold">${i + 1}</td>
+            <td><input type="number" step="0.1" value="${s[0]}"></td>
+            <td><input type="number" step="0.01" value="${s[1]}"></td>
+            <td><input type="number" step="0.01" value="${s[2]}"></td>
+            <td class="center">—</td>
+            <td class="center">—</td>
+            <td class="center">—</td>
+            <td class="center">—</td>
+        `;
+        tbody.appendChild(tr);
+        tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input', computeDLSTable));
+    });
+    computeDLSTable();
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+function showTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    document.getElementById('content-' + tabId).classList.add('active');
+    // Refresh chart if switching to chart-containing tab
+    if (tabId === 'max-length') {
+        setTimeout(() => renderChart(), 50);
+    }
+}
+
+/* ============================================================
+   PRINT
+   ============================================================ */
+function printPage() {
+    window.print();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+    populateDropdowns();
+    updateConfig();
+
+    // Hook up config change listeners
+    ['casing-select', 'tubing-select', 'esp-series-select', 'material-select',
+     'esp-od', 'esp-length', 'ovality', 'yield-ksi', 'modulus-Mpsi'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', updateConfig);
+        if (el) el.addEventListener('input', updateConfig);
+    });
+
+    // Hook up initial DLS row inputs
+    document.querySelectorAll('#dls-table tbody input').forEach(inp => {
+        inp.addEventListener('input', computeDLSTable);
+    });
+
+    // Initial state
+    showTab('config');
+});
+
+</script>
+
+</body>
+</html>
